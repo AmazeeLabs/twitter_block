@@ -1,4 +1,3 @@
-; $Id$
 name = Twitter Block module
 description = "Provides configurable blocks for a Twitter feed."
 core = 7.x
