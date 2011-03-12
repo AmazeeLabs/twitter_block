@@ -28,8 +28,6 @@ function twitter_block_permission() {
   return array(
     'administer twitter blocks' => array(
       'title' => t('Administer Twitter Blocks')),
-    'access twitter blocks' => array(
-      'title' => t('Access Twitter Blocks')),
   );
 }
 
