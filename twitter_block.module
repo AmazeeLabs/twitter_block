@@ -236,8 +236,8 @@ function theme_twitter_block_tweets($tweet_object, $variables = array() ) {
 <div class="twitter_block tweet">
   <div class="twitter_block_user">
     <a class="twitter_block profile_image" href="http://twitter.com/{$tweet['from_user']}">
-      <img src="{$tweet['profile_image_url']}" alt="@{$tweet['from_user']} "/>
-    </a>
+      <img src="{$tweet['profile_image_url']}" alt="Twitter Avitar"/>
+        @{$tweet['from_user']}</a>
     $text $tweet_link 
   </div>
 </div>
