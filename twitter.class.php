@@ -126,6 +126,7 @@ class TwitterSearch {
     $twitter_data = curl_exec($ch);
     $this->http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+
     curl_close($ch);
 
     return $twitter_data;

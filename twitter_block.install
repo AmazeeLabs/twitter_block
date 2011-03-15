@@ -67,7 +67,7 @@ function twitter_block_install() {
       'delta' => 'default',
       'search_type' => 'searchHashtag',
       'search_string' => 'Drupal',
-      'default_title' => t('Drupal discussions on Twitter'),
+      'default_title' => st('Discussions on Twitter'),
     ))
     ->execute();
 }

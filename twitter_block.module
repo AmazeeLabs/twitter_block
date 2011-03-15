@@ -59,7 +59,7 @@ function get_twitter_block_config($delta) {
  *
  * @todo Finish this form so we can add and configure multiple blocks.
  */
-function twitter_blocks_admin_form() {
+function twitter_block_admin_form() {
   $form = array();
   $result = db_query("SELECT delta FROM {twitter_block}");
 
