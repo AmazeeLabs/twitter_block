@@ -37,7 +37,7 @@ function twitter_block_permission() {
 function get_twitter_block_config($delta) {
   static $config;
   if (!isset($config[$delta])) {
-    $result = db_query("SELECT search_type, search_string, default_title, rpp".
+    $result = db_query("SELECT search_type, search_string, default_title, results_per_page".
                         " FROM {twitter_block} WHERE delta = :delta", 
                         array(':delta' => $delta));
 
@@ -138,12 +138,12 @@ function twitter_block_block_configure($delta) {
  */
   );
 
-  $form['twitter_block_' . $delta]['rpp'] = array(
+  $form['twitter_block_' . $delta]['results_per_page'] = array(
     '#type' => 'textfield',
     '#title' => 'Number of tweets to return',
     '#help' => t('Please enter the number of tweets to return per page up to a maximum of 100.'),
     '#size' => 12,
-    '#default_value' => $config['rpp'],
+    '#default_value' => $config['results_per_page'],
   );
 
   return $form; 
@@ -161,8 +161,8 @@ function twitter_block_form_validate($element, &$form_state) {
   }
   
   // Twitter doesn't like to return more than 100 tweets.
-  if ($element['rpp']['#value'] > 100) {
-    form_set_error( 'rpp', t("The Twitter API limits the number of tweets returned to 100 or less."));
+  if ($element['results_per_page']['#value'] > 100) {
+    form_set_error( 'results_per_page', t("The Twitter API limits the number of tweets returned to 100 or less."));
   }
 }
 
@@ -182,7 +182,7 @@ function twitter_block_block_save($delta = '', $edit = array()) {
     ->fields(array(
       'search_type' => $edit['search_type'],
       'search_string' => $edit['search_string'],
-      'rpp' => $edit['rpp'],
+      'results_per_page' => $edit['results_per_page'],
       ))
     ->condition('delta', $delta)
     ->execute();
@@ -211,14 +211,17 @@ function twitter_block_block_view($delta) {
  * Implements hook_theme().
  */
 function twitter_block_theme($existing, $type , $theme, $path) {
-  // @todo I'm fairly sure this belongs elsewhere
-  $path = DRUPAL_ROOT . '/' . drupal_get_path('module', 'twitter_block');
-  drupal_add_css($path . '/twitter_block.css');
-  
   return array(
     'twitter_block' => array('variables' => array()),
     'twitter_block_tweets' =>array('variables' => array()),
   );  
+}
+
+/**
+ * Implements hook_init().
+ */
+function twitter_block_init() {
+  drupal_add_css( drupal_get_path('module', 'twitter_block') . '/twitter_block.css');
 }
 
 /**
@@ -227,19 +230,15 @@ function twitter_block_theme($existing, $type , $theme, $path) {
 function theme_twitter_block_tweets($tweet_object, $variables = array() ) {
   $tweet = get_object_vars($tweet_object['tweet']);
   
-  // Set up tweet with link.
-  $path = 'http://twitter.com/#!/' . $tweet['from_user'] . '/statuses/' . $tweet['id_str']; 
-  $text =  $tweet['text'] ;
-  $tweet_link = l( '[view]', $path );
-
   $html = <<<EOHTML
 <div class="twitter_block tweet">
   <div class="twitter_block_user">
+  <img src="{$tweet['profile_image_url']}" alt="Twitter Avitar"/>
     <a class="twitter_block profile_image" href="http://twitter.com/{$tweet['from_user']}">
-      <img src="{$tweet['profile_image_url']}" alt="Twitter Avitar"/>
-        @{$tweet['from_user']}</a>
-    $text $tweet_link 
-  </div>
+        <span class="twitter_block_user_name">@{$tweet['from_user']}</span>
+      </a>
+    </div>
+  <div class="tweet_text"><p class="tweet">{$tweet['text']}</p></div> 
 </div>
 EOHTML;
   

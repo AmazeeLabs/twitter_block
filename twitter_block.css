@@ -11,6 +11,17 @@
   padding: 0;
 }
 
+.twitter_block_user img {
+  height: 48px;
+  width:  48px;
+}
+.twitter_block_user_name {
+  display: block;
+  padding-right: 5px;
+  float: left;
+  line-height: 48px;
+}
+
 p.tweet {
   display: block;
   float: left;
