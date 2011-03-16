@@ -64,7 +64,7 @@ class TwitterSearch {
    * @return string $json JSON encoded search response
    */
   private function getTweetsFrom() {
-    $this->options['q'] = "from$this->twitter_name";
+    $this->options['q'] = "from:$this->twitter_name";
     $json = $this->search();
     return $json;
   }
@@ -75,7 +75,7 @@ class TwitterSearch {
    * @return string $json JSON encoded search response
    */
   private function getMentions() {
-    $this->options['q'] = $this->twitter_name;
+    $this->options['q'] = "@$this->twitter_name";
     $json = $this->search();
     return $json;
   }
@@ -86,7 +86,7 @@ class TwitterSearch {
    * @return string JSON encoded search response
    */
   private function getReplies() {
-    $this->options['q'] = "to$this->twitter_name";
+    $this->options['q'] = "to:$this->twitter_name";
     $json = $this->search();
     return $json;
   }
@@ -117,7 +117,7 @@ class TwitterSearch {
   function search() {
     $url = 'http://search.twitter.com/search.json?' . http_build_query($this->options);
     $ch = curl_init($url);
-    
+    ars_dd($url, "the full url query included.");
     // Applications must have a meaningful and unique User Agent. 
     curl_setopt($ch, CURLOPT_USERAGENT, "Drupal Twitter Block Module");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);

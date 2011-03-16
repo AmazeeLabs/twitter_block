@@ -157,7 +157,8 @@ function twitter_block_form_validate($element, &$form_state) {
   // @todo Should we also check other criteria?
   if ( $element['search_type']['#value'] !== 'searchHashtag' 
         && strpos( $element['search_string']['#value'], '@' ) !== 0) {
-    form_set_error( 'search_string', t('Twitter names should start with "@".') );
+          //form_set_error( 'search_string', t('Twitter names should start with "@".') );
+          $element['search_string']['#value'] = substr($element['search_string']['#value'], 1);
   }
   
   // Twitter doesn't like to return more than 100 tweets.
