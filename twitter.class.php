@@ -22,7 +22,7 @@ class TwitterSearch {
   private $http_status;
 
   // Search parameters as defined by the API to be used w/ http_build_query
-  private $query_parameters = array();
+  private $options = array();
 
   // Determines which getter to use.
   private $search_type;
@@ -44,10 +44,10 @@ class TwitterSearch {
 
     // The number of tweets to return per page, up to a max of 100.
     if (isset( $config['results_per_page'])) {
-      $this->query_parameters['results_per_page'] = $config['results_per_page'];
+      $this->options['rpp'] = $config['results_per_page'];
     }
     else {
-      $this->query_parameters['results_per_page'] = variable_get('twitter_block_default_results_per_page', 10);
+      $this->options['rpp'] = variable_get('twitter_block_default_results_per_page', 10);
     }
   }
 
@@ -117,7 +117,7 @@ class TwitterSearch {
   function search() {
     $url = 'http://search.twitter.com/search.json?' . http_build_query($this->options);
     $ch = curl_init($url);
-
+ars_dd($url, "the url w/ query");
     // Applications must have a meaningful and unique User Agent. 
     curl_setopt($ch, CURLOPT_USERAGENT, "Drupal Twitter Block Module");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
