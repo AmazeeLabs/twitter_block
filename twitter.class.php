@@ -117,7 +117,7 @@ class TwitterSearch {
   function search() {
     $url = 'http://search.twitter.com/search.json?' . http_build_query($this->options);
     $ch = curl_init($url);
-ars_dd($url, "the url w/ query");
+    
     // Applications must have a meaningful and unique User Agent. 
     curl_setopt($ch, CURLOPT_USERAGENT, "Drupal Twitter Block Module");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
