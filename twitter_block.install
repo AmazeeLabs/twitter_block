@@ -42,7 +42,13 @@ function twitter_block_schema() {
       ),
       'results_per_page' => array(
         'description' => '"Returns per page" from the Twitter Search API.',
-        'type' => 'int',
+        'type' => 'varchar',
+        'length' => 8,
+      ),
+      'lang' => array(
+        'description' => 'Optional Twitter language filter.',
+        'type' => 'varchar',
+        'length' => '8', // Technically we only need 2...
       ),
     ), 
     'unique keys' => array(
@@ -78,4 +84,15 @@ function twitter_block_install() {
  */
 function twitter_block_uninstall() {
   variable_del('twitter_block_default_results_per_page');
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function twitter_block_update_7100() {
+  db_add_field('twitter_block', 'lang', array(
+    'description' => 'Optional Twitter language filter.',
+    'type' => 'varchar',
+    'length' => '6',
+  ));
 }

@@ -31,6 +31,9 @@ class TwitterSearch {
   private $search_string;
   private $twitter_name;
 
+  // The url including the encoded query
+  public $url_query;
+
   public function __construct($config = array()) {
     $this->search_type = $config['search_type'];
     
@@ -42,12 +45,17 @@ class TwitterSearch {
       $this->twitter_name = $config['search_string'];
     }
 
-    // The number of tweets to return per page, up to a max of 100.
-    if (isset( $config['results_per_page'])) {
+    // The number of tweets to return per page.
+    if ( !empty( $config['results_per_page']) ) {
       $this->options['rpp'] = $config['results_per_page'];
     }
     else {
-      $this->options['rpp'] = variable_get('twitter_block_default_results_per_page', 10);
+      $this->options['rpp'] = variable_get('twitter_block_default_results_per_page', 15);
+    }
+
+    // Filter by language, but only if there is one set in the config.
+    if (isset($config['lang']) && !empty($config['lang'])) {
+      $this->options['lang'] = $config['lang'];
     }
   }
 
@@ -115,9 +123,9 @@ class TwitterSearch {
    * @return string JSON encoded search response.
    */
   function search() {
-    $url = 'http://search.twitter.com/search.json?' . http_build_query($this->options);
-    $ch = curl_init($url);
-    ars_dd($url, "the full url query included.");
+    $this->url_query = 'http://search.twitter.com/search.json?' . http_build_query($this->options);
+    $ch = curl_init($this->url_query);
+    
     // Applications must have a meaningful and unique User Agent. 
     curl_setopt($ch, CURLOPT_USERAGENT, "Drupal Twitter Block Module");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
