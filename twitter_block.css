@@ -1,7 +1,6 @@
 
 .twitter_block_user {
   display: block;
-  float: left;
 }
 
 #twitter_block_results li {
@@ -12,6 +11,7 @@
 }
 
 .twitter_block_user img {
+  float: left;
   height: 48px;
   width:  48px;
 }
