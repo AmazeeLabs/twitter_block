@@ -40,7 +40,7 @@ function twitter_block_schema() {
         'not null' => TRUE, 
         'default' => '',
       ),
-      'rpp' => array(
+      'results_per_page' => array(
         'description' => '"Returns per page" from the Twitter Search API.',
         'type' => 'int',
       ),
@@ -77,5 +77,5 @@ function twitter_block_install() {
  * Implements hook_uninstall().
  */
 function twitter_block_uninstall() {
-  variable_del('twitter_block_default_rpp');
+  variable_del('twitter_block_default_results_per_page');
 }
