@@ -216,18 +216,27 @@ function twitter_block_block_view($delta) {
   $config = get_twitter_block_config($delta);
 
   $twitter = new TwitterSearch($config);
-  $twitter_reply = json_decode($twitter->getJSON());
+  $twitter_reply = cache_get($cid = 'twitter_block_'.$delta, $bin = 'cache');
 
-  if (isset($twitter_reply->results) ) {
     $block['subject'] = t($config['default_title']);
-    $block['content'] = theme('twitter_block', $twitter_reply->results );
-  }
-  else {
+
+  if($twitter_reply == null){
+      $twitter_reply = json_decode($twitter->getJSON());
+      if (!isset( $twitter_reply -> results) ) {
     watchdog('Twitter Block', 'Recieved an unexpected reply from Twitter. ' .
         'Perhaps just a fail whale? Our search url with query:<br/>' .
-        '@url_query', array( 'url_query' => $twitter->url_query),
+        '@url_query', array( 'url_query' => $twitter -> url_query),
         WATCHDOG_NOTICE);
   }
+      else{
+      cache_set('twitter_block_'.$delta,$twitter_reply,'cache',CACHE_TEMPORARY);
+      $block['content'] = theme('twitter_block', $twitter_reply -> results );
+      }
+  }
+  else{
+      $block['content'] = theme('twitter_block', $twitter_reply -> data ->results );
+  }
+
   return $block;
 }
 
