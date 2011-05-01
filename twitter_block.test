@@ -5,8 +5,8 @@
  * Test case for testing the twitter_block module.
  *
  * @todo Finish Test Cases
- * This is a work in progress. Many (if not all) of these tests will likely 
- * fail as I've only just started to write them. 
+ * This is a work in progress. Many (if not all) of these tests will likely
+ * fail as I've only just started to write them.
  */
 class TwitterBlockTestCase extends DrupalWebTestCase {
   protected $web_user;
@@ -29,7 +29,7 @@ class TwitterBlockTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Login user and test block functionality through the admin and user 
+   * Login user and test block functionality through the admin and user
    * interfaces.
    */
   function testTwitterBlockBasic() {
@@ -51,16 +51,16 @@ class TwitterBlockTestCase extends DrupalWebTestCase {
     $this->drupalPost('admin/structure/block', array('blocks[twitter_block_default_block][region]' => 'sidebar_first'), t('Save blocks'));
     $this->drupalGet('/');
     $this->assertRaw( t('Drupal Discussion on Twitter'), t('Default Twitter block text found.'));
-    
+
     // Add a new twitter block
-    $string->this->randomName();
+    $string = $this->randomName();
     $delta = strtolower($string);
     $this->drupalPost('admin/config/twitter_block', array(
         'twitter_block_delta' => $delta,
         'twitter_block_title' => $string,
         // A commonly tweeted value so we know there will be content.
         'twitter_block_search_string' => 'twitter',
-      ), 
+      ),
       t('Save block'));
 
     // Find new block on settings page.
@@ -69,8 +69,8 @@ class TwitterBlockTestCase extends DrupalWebTestCase {
     // Verify new block is not shown
     $this->drupalGet('/');
     $this->assertNoRaw($string, "New Twitter block isn't enabled yet. Not found.");
-   
-    // Enable new block and verify 
+
+    // Enable new block and verify
     $this->drupalPost('admin/structure/block', array("blocks[twitter_block_$delta][region]" => 'sidebar_first'), t('Save blocks'));
     $this->assertRaw($string, "New Twitter block is displayed.");
   }

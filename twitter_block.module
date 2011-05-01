@@ -38,7 +38,7 @@ function get_twitter_block_config($delta) {
   static $config;
   if (!isset($config[$delta])) {
     $result = db_query("SELECT search_type, search_string, default_title, results_per_page, lang".
-                        " FROM {twitter_block} WHERE delta = :delta", 
+                        " FROM {twitter_block} WHERE delta = :delta",
                         array(':delta' => $delta));
 
     // @todo There can be only one?
@@ -103,7 +103,7 @@ function twitter_block_block_configure($delta) {
 
 /**
  * @todo Provide dynamic form goodness. Right now it is persistently broken.
- * There's a javascript error on the page that is very likely related. 
+ * There's a javascript error on the page that is very likely related.
   $form['twitter_block_' . $delta]['public_timeline'] = array(
     '#type' => 'radios',
     '#options' => array('TRUE' => t('Public Timeline'), 'FALSE' => t('By User')),
@@ -156,22 +156,22 @@ function twitter_block_block_configure($delta) {
     '#default_value' => $config['results_per_page'],
   );
 
-  return $form; 
+  return $form;
 }
 
 /**
  * Validates twitter block configuration options before saving the form.
  */
 function twitter_block_form_validate($element, &$form_state) {
-  // Strip off the leading @. 
-  if ( $element['search_type']['#value'] !== 'searchHashtag' 
+  // Strip off the leading @.
+  if ( $element['search_type']['#value'] !== 'searchHashtag'
         && strpos( $element['search_string']['#value'], '@' ) !== 0) {
           //form_set_error( 'search_string', t('Twitter names should start with "@".') );
           $element['search_string']['#value'] = substr($element['search_string']['#value'], 1);
   }
-  
+
   if ( !empty($element['results_per_page']['#value']) ) {
-    if ( !ctype_digit( $element['results_per_page']['#value']) ) { 
+    if ( !ctype_digit( $element['results_per_page']['#value']) ) {
       form_set_error( 'results_per_page', t('The number of results must be an integer.'));
     }
     // Twitter doesn't like to return more than 100 tweets.
@@ -208,10 +208,10 @@ function twitter_block_block_save($delta = '', $edit = array()) {
 /**
  * Implements hook_block_view().
  */
-function twitter_block_block_view($delta) {  
+function twitter_block_block_view($delta) {
   module_load_include( 'php', 'twitter_block', 'twitter.class' );
 
- 
+
   $block = array();
   $config = get_twitter_block_config($delta);
 
@@ -247,7 +247,7 @@ function twitter_block_theme($existing, $type , $theme, $path) {
   return array(
     'twitter_block' => array('variables' => array()),
     'twitter_block_tweets' =>array('variables' => array()),
-  );  
+  );
 }
 
 /**
@@ -271,10 +271,10 @@ function theme_twitter_block_tweets($tweet_object, $variables = array() ) {
         <span class="twitter_block_user_name">@{$tweet['from_user']}</span>
       </a>
     </div>
-  <div class="tweet_text"><p class="tweet">{$tweet['text']}</p></div> 
+  <div class="tweet_text"><p class="tweet">{$tweet['text']}</p></div>
 </div>
 EOHTML;
-  
+
   return $html;
 }
 
@@ -283,7 +283,7 @@ EOHTML;
  */
 function theme_twitter_block($twitter_result, $variables = array() ) {
   foreach($twitter_result as $tweet) {
-    $tweets[] = theme('twitter_block_tweets', array('tweet' => $tweet)); 
+    $tweets[] = theme('twitter_block_tweets', array('tweet' => $tweet));
   }
 
   // Don't show an empty block
@@ -295,8 +295,7 @@ function theme_twitter_block($twitter_result, $variables = array() ) {
   }
 }
 
-function twitter_block_linkify($status_text)
-{
+function twitter_block_linkify($status_text) {
   // linkify URLs
   $status_text = preg_replace(
     '/(https?:\/\/\S+)/',
