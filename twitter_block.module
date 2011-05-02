@@ -140,7 +140,7 @@ function twitter_block_block_configure($delta) {
   $form['twitter_block_' . $delta]['lang'] = array(
     '#type'  => 'textfield',
     '#title' => 'Language',
-    '#help'  => t('If you would like to limit the search by a language, '.
+    '#description' => t('If you would like to limit the search by a language, '.
             'you can set it here. This should be the specific string expected by '.
             'twitter for your language. See the twitter advanced search page for '.
             'more information. (Hint: English is "en"). Leave blank if you don\'t '.

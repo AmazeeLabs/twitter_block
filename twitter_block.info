@@ -1,4 +1,4 @@
-name = Twitter Block module
+name = Twitter Block
 description = "Provides configurable blocks for a Twitter feed."
 core = 7.x
 
