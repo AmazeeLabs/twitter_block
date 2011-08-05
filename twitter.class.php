@@ -123,7 +123,7 @@ class TwitterSearch {
    * @return string JSON encoded search response.
    */
   function search() {
-    $this->url_query = 'http://search.twitter.com/search.json?' . http_build_query($this->options);
+    $this->url_query = 'http://search.twitter.com/search.json?' . drupal_http_build_query($this->options);
     $ch = curl_init($this->url_query);
     
     // Applications must have a meaningful and unique User Agent. 
