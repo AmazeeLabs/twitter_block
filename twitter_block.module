@@ -343,3 +343,12 @@ function twitter_block_linkify($status_text) {
 
   return $status_text;
 }
+
+/**
+ * Implementation of hook_ctools_plugin_directory().
+ */
+function twitter_block_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools') {
+    return 'plugins/' . $plugin;
+  }
+}
