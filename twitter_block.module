@@ -22,24 +22,24 @@ function twitter_block_menu() {
 }
 
 /**
- * Implements hook_permission()
+ * Implements hook_permission().
  */
 function twitter_block_permission() {
   return array(
     'administer twitter blocks' => array(
-      'title' => t('Administer Twitter Blocks')),
+      'title' => t('Administer Twitter Blocks'),
+    ),
   );
 }
 
 /**
- * Retrieve the twitter block configuration options from the db.
+ * Retrieve the Twitter block configuration options from the db.
  */
-function get_twitter_block_config($delta) {
+function twitter_block_get_config($delta) {
   static $config;
   if (!isset($config[$delta])) {
     $result = db_query("SELECT search_type, search_string, default_title, results_per_page, lang" .
-                        " FROM {twitter_block} WHERE delta = :delta",
-                        array(':delta' => $delta));
+      " FROM {twitter_block} WHERE delta = :delta", array(':delta' => $delta));
 
     // @todo There can be only one?
     foreach ($result as $record) {
@@ -55,7 +55,7 @@ function get_twitter_block_config($delta) {
 }
 
 /**
- * The configuration form for twitter blocks.
+ * The configuration form for Twitter blocks.
  *
  * @todo Finish this form so we can add and configure multiple blocks.
  */
@@ -90,7 +90,7 @@ function twitter_block_block_info() {
  * Implements hook_block_configure().
  */
 function twitter_block_block_configure($delta) {
-  $config = get_twitter_block_config($delta);
+  $config = twitter_block_get_config($delta);
   $form = array();
 
   $form['twitter_block_' . $delta] = array(
@@ -132,9 +132,9 @@ function twitter_block_block_configure($delta) {
     /**
      * More broken dynamic form bits...
     // only provide options for Search by User.
-    '#states' => array ( 'invisible' => array(
+    '#states' => array ('invisible' => array(
       ':input[name="public_timeline"]' => array('FALSE')),
-     ),
+    ),
  */
   );
   $form['twitter_block_' . $delta]['lang'] = array(
@@ -160,23 +160,23 @@ function twitter_block_block_configure($delta) {
 }
 
 /**
- * Validates twitter block configuration options before saving the form.
+ * Validates Twitter block configuration options before saving the form.
  */
 function twitter_block_form_validate($element, &$form_state) {
   // Strip off the leading @.
-  if ( $element['search_type']['#value'] !== 'searchHashtag'
-        && strpos( $element['search_string']['#value'], '@' ) !== 0) {
-          //form_set_error( 'search_string', t('Twitter names should start with "@".') );
-          $element['search_string']['#value'] = substr($element['search_string']['#value'], 1);
+  if ($element['search_type']['#value'] !== 'searchHashtag'
+      && strpos($element['search_string']['#value'], '@') !== 0) {
+    //form_set_error('search_string', t('Twitter names should start with "@".') );
+    $element['search_string']['#value'] = substr($element['search_string']['#value'], 1);
   }
 
-  if ( !empty($element['results_per_page']['#value']) ) {
-    if ( !ctype_digit( $element['results_per_page']['#value']) ) {
-      form_set_error( 'results_per_page', t('The number of results must be an integer.'));
+  if (!empty($element['results_per_page']['#value']) ) {
+    if (!ctype_digit($element['results_per_page']['#value']) ) {
+      form_set_error('results_per_page', t('The number of results must be an integer.'));
     }
     // Twitter doesn't like to return more than 100 tweets.
     elseif ($element['results_per_page']['#value'] > 100) {
-    form_set_error( 'results_per_page', t("The Twitter API limits the number of tweets returned to 100 or less."));
+      form_set_error('results_per_page', t("The Twitter API limits the number of tweets returned to 100 or less."));
     }
   }
 }
@@ -209,35 +209,56 @@ function twitter_block_block_save($delta = '', $edit = array()) {
  * Implements hook_block_view().
  */
 function twitter_block_block_view($delta) {
-  module_load_include( 'php', 'twitter_block', 'twitter.class' );
+  // Load the configuration.
+  $config = twitter_block_get_config($delta);
 
-
+  // Define the configation.
   $block = array();
-  $config = get_twitter_block_config($delta);
-
-  $twitter = new TwitterSearch($config);
-  $twitter_reply = cache_get($cid = 'twitter_block_' . $delta, $bin = 'cache');
-
-    $block['subject'] = t($config['default_title']);
-
-  if ($twitter_reply == NULL) {
-      $twitter_reply = json_decode($twitter->getJSON());
-      if (!isset( $twitter_reply -> results) ) {
-    watchdog('Twitter Block', 'Recieved an unexpected reply from Twitter. ' .
-        'Perhaps just a fail whale? Our search url with query:<br/>' .
-        '@url_query', array( 'url_query' => $twitter -> url_query),
-        WATCHDOG_NOTICE);
-  }
-      else{
-      cache_set('twitter_block_' . $delta, $twitter_reply, 'cache', CACHE_TEMPORARY);
-      $block['content'] = theme('twitter_block', $twitter_reply -> results );
-      }
-  }
-  else{
-      $block['content'] = theme('twitter_block', $twitter_reply -> data ->results );
-  }
+  $block['subject'] = t($config['default_title']);
+  $block['content'] = twitter_block_load_tweets($config);
 
   return $block;
+}
+
+/**
+ * Grab data from Twitter, store it for later.
+ * @param $config An array suitable for passing to the TwitterSearch object.
+ * @return Themed output.
+ */
+function twitter_block_load_tweets($config) {
+  module_load_include('php', 'twitter_block', 'twitter.class');
+
+  // We use the MD5 of the block config as cache cid.
+  $cid = 'twitter_block_feed_' . md5(serialize($config));
+  $cache_bin = 'cache';
+
+  // Build the object.
+  $twitter = new TwitterSearch($config);
+
+  // We cache response even if it's empty so an empty response cannot cause a
+  // performance problem by making us contact Twitter in every request
+  if ($cache = cache_get($cid, $cache_bin)) {
+    $results = $cache->data;
+  }
+  else {
+    $response = $twitter->getJSON();
+    $results = array();
+    if (empty($response) || !is_array($response) || !isset($response['status']) || $response['status'] !== TRUE) {
+      watchdog('Twitter Block', 'Recieved an unexpected reply from Twitter. ' .
+        'Perhaps just a fail whale?<br/>' .
+        'URL: url_query<br />' .
+        'response', array('url_query' => $twitter->url_query, 'response' => print_r($response, TRUE)),
+        WATCHDOG_NOTICE);
+    }
+    else {
+      $results = $response['results'];
+    }
+
+    // Save the data for later.
+    cache_set($cid, $results, $cache_bin, CACHE_TEMPORARY);
+  }
+
+  return theme('twitter_block', array('twitter_result' => $results, 'api' => $twitter->getApi()));
 }
 
 /**
@@ -245,33 +266,32 @@ function twitter_block_block_view($delta) {
  */
 function twitter_block_theme($existing, $type , $theme, $path) {
   return array(
-    'twitter_block' => array('variables' => array()),
-    'twitter_block_tweets' => array('variables' => array()),
+    'twitter_block' => array(
+      'variables' => array('twitter_result' => NULL, 'api' => NULL),
+    ),
+    'twitter_block_tweets' =>array(
+      'variables' => array('tweet' => NULL, 'api' => NULL),
+    ),
   );
 }
 
 /**
- * Implements hook_init().
+ * Returns themed HTML for individual tweets.
  */
-function twitter_block_init() {
-  drupal_add_css( drupal_get_path('module', 'twitter_block') . '/twitter_block.css');
-}
-
-/**
- * Returns themed html for individual tweets
- */
-function theme_twitter_block_tweets($tweet_object, $variables = array() ) {
-  $tweet = get_object_vars($tweet_object['tweet']);
-  $tweet['text'] = twitter_block_linkify($tweet['text']);
+function theme_twitter_block_tweets($variables) {
+  $tweet = $variables['tweet'];
+  $text = twitter_block_linkify($tweet->text);
+  $user_image = ($variables['api'] == 'rest') ? $tweet->user->profile_image_url : $tweet->profile_image_url;
+  $user_name = ($variables['api'] == 'rest') ? $tweet->user->screen_name : $tweet->from_user;
   $html = <<<EOHTML
 <div class="twitter_block tweet">
   <div class="twitter_block_user">
-  <img src="{$tweet['profile_image_url']}" alt="Twitter Avitar"/>
-    <a class="twitter_block profile_image" href="http://twitter.com/{$tweet['from_user']}">
-        <span class="twitter_block_user_name">@{$tweet['from_user']}</span>
-      </a>
-    </div>
-  <div class="tweet_text"><p class="tweet">{$tweet['text']}</p></div>
+    <a class="twitter_block profile_image" href="http://twitter.com/{$user_name}">
+      <img src="{$user_image}" alt="Twitter Avatar" />
+      <span class="twitter_block_user_name">@{$user_name}</span>
+    </a>
+  </div>
+  <div class="tweet_text"><p class="tweet">{$text}</p></div>
 </div>
 EOHTML;
 
@@ -279,14 +299,15 @@ EOHTML;
 }
 
 /**
- * Returns themed html for a twitter block
+ * Returns themed HTML for a Twitter block.
  */
-function theme_twitter_block($twitter_result, $variables = array() ) {
-  foreach ($twitter_result as $tweet) {
-    $tweets[] = theme('twitter_block_tweets', array('tweet' => $tweet));
+function theme_twitter_block($variables) {
+  $twitter_result = $variables['twitter_result'];
+  foreach($twitter_result as $tweet) {  
+    $tweets[] = theme('twitter_block_tweets', array('tweet' => $tweet, 'api' => $variables['api'])); 
   }
 
-  // Don't show an empty block
+  // Don't show an empty block.
   if (count($twitter_result) > 0) {
     $html = '<div id="twitter_block_results" class="twitter_block">';
     $html .= theme('item_list', array('items' => $tweets));
@@ -295,22 +316,25 @@ function theme_twitter_block($twitter_result, $variables = array() ) {
   }
 }
 
+/**
+ * Convert nested URLs, account names and hash tags into links.
+ */
 function twitter_block_linkify($status_text) {
-  // linkify URLs
+  // Linkify URLs.
   $status_text = preg_replace(
     '/(https?:\/\/\S+)/',
     '<a href="\1">\1</a>',
     $status_text
   );
 
-  // linkify twitter users
+  // Linkify twitter users.
   $status_text = preg_replace(
     '/(^|\s)@(\w+)/',
     '\1@<a href="http://twitter.com/\2">\2</a>',
     $status_text
   );
 
-  // linkify tags
+  // Linkify tags.
   $status_text = preg_replace(
     '/(^|\s)#([\wåäöÅÄÖ]+)/',
     '\1#<a href="http://search.twitter.com/search?q=%23\2">\2</a>',

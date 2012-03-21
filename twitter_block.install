@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Install, update and uninstal functions for the twitter_block module
+ * Install, update and uninstall functions for the twitter_block module.
  */
 
 /**
- * Implements hook_schema
+ * Implements hook_schema().
  */
 function twitter_block_schema() {
   $schema['twitter_block'] = array(

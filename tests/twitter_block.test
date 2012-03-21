@@ -41,16 +41,16 @@ class TwitterBlockTestCase extends DrupalWebTestCase {
     // Verify the default settings for block are processed.
     $this->assertFieldByName('blocks[twitter_block_default_block][region]', 'sidebar_first', t('Default Twitter block is enabled in first sidebar successfully verified.') );
 
-    // Verify that blocks are not shown
+    // Verify that blocks are not shown.
     $this->drupalGet('/');
     $this->assertNoRaw( t('Drupal Discussion on Twitter'), t('Default Twitter block test not found.'));
 
-    // Enable the Default block and verify
+    // Enable the Default block and verify.
     $this->drupalPost('admin/structure/block', array('blocks[twitter_block_default_block][region]' => 'sidebar_first'), t('Save blocks'));
     $this->drupalGet('/');
     $this->assertRaw( t('Drupal Discussion on Twitter'), t('Default Twitter block text found.'));
 
-    // Add a new twitter block
+    // Add a new twitter block.
     /*
     $string = $this->randomName();
     $delta = strtolower($string);
@@ -65,11 +65,11 @@ class TwitterBlockTestCase extends DrupalWebTestCase {
     // Find new block on settings page.
     $this->assertRaw($string, t('New Twitter block is configurable-String found.'));
 
-    // Verify new block is not shown
+    // Verify new block is not shown.
     $this->drupalGet('/');
     $this->assertNoRaw($string, "New Twitter block isn't enabled yet. Not found.");
 
-    // Enable new block and verify
+    // Enable new block and verify.
     $this->drupalPost('admin/structure/block', array("blocks[twitter_block_$delta][region]" => 'sidebar_first'), t('Save blocks'));
     $this->assertRaw($string, "New Twitter block is displayed.");
     // */
