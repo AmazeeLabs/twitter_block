@@ -142,9 +142,10 @@ function twitter_block_block_configure($delta) {
     '#title' => 'Language',
     '#description' => t('If you would like to limit the search by a language, ' .
             'you can set it here. This should be the specific string expected by ' .
-            'twitter for your language. See the twitter advanced search page for ' .
-            'more information. (Hint: English is "en"). Leave blank if you don\'t ' .
-            'want to filter by language at all.'),
+            'twitter for your language. See the <a href="@language">twitter advanced search page</a> ' .
+            'for more information. (Hint: English is "en"). Leave blank if you don\'t ' .
+            'want to filter by language at all.', array(
+            '@language' => 'http://twitter.com/#!/search-advanced')),
     '#size'  => 12,
     '#default_value' => $config['lang'],
   );
