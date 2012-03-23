@@ -12,11 +12,11 @@
  */
 
 /**
- * TwitterSearch provides the class for using the Twitter Search API.
+ * TwitterBlockSearch provides the class for using the Twitter Search API.
  *
  * For more information on the API, see http://dev.twitter.com/doc/get/search
  */
-class TwitterSearch {
+class TwitterBlockSearch {
 
   // HTTP status code returned
   private $http_status;

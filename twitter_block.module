@@ -189,7 +189,7 @@ function twitter_block_block_save($delta = '', $edit = array()) {
   /*
    * More broken dynamic form bits.
 
-  // Map public_timeline checkbox to search_type expected by TwitterSearch
+  // Map public_timeline checkbox to search_type expected by TwitterBlockSearch
   if ($edit['public_timeline'] === 'TRUE' ) {
   $edit['search_type'] = 'searchHashtag';
   } //*/
@@ -223,7 +223,7 @@ function twitter_block_block_view($delta) {
 
 /**
  * Grab data from Twitter, store it for later.
- * @param $config An array suitable for passing to the TwitterSearch object.
+ * @param $config An array suitable for passing to the TwitterBlockSearch object.
  * @return Themed output.
  */
 function twitter_block_load_tweets($config) {
@@ -234,7 +234,7 @@ function twitter_block_load_tweets($config) {
   $cache_bin = 'cache';
 
   // Build the object.
-  $twitter = new TwitterSearch($config);
+  $twitter = new TwitterBlockSearch($config);
 
   // We cache response even if it's empty so an empty response cannot cause a
   // performance problem by making us contact Twitter in every request
