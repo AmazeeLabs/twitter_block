@@ -22,7 +22,6 @@ $plugin = array(
 function twitter_block_content_type_render($subtype, $conf, $args) {
   $block = new stdClass();
   $block->content = twitter_block_load_tweets($conf);
-
   return $block;
 }
 
@@ -89,10 +88,10 @@ function twitter_block_content_type_edit_form_submit($form, &$form_state) {
  */
 function twitter_block_content_type_admin_info($subtype, $conf) {
   $strings = array(
-    'searchHashtag' => t('Tweets mentioning #hashtag or search string.'),
-    'getTweetsFrom' => t('Tweets sent from the Twitter user.'),
-    'getReplies' => t('Replies to the Twitter user.'),
-    'getMentions' => t('Tweets mentioning the Twitter user.'),
+    'searchHashtag' => t('Tweets mentioning #hashtag or search string'),
+    'getTweetsFrom' => t('Tweets sent from the Twitter user'),
+    'getReplies' => t('Replies to the Twitter user'),
+    'getMentions' => t('Tweets mentioning the Twitter user'),
   );
 
   $block = twitter_block_content_type_render($subtype, $conf, array());
