@@ -231,33 +231,21 @@ function twitter_block_theme($existing, $type , $theme, $path) {
     'twitter_block' => array(
       'variables' => array('twitter_result' => NULL, 'api' => NULL),
     ),
-    'twitter_block_tweets' =>array(
+    'twitter_block_tweet' =>array(
       'variables' => array('tweet' => NULL, 'api' => NULL),
+      'path' => drupal_get_path('module', 'twitter_block'),
+      'template' => 'twitter-block-tweet'
     ),
   );
 }
 
 /**
- * Returns themed HTML for individual tweets.
+ * Implements hook_preprocess().
  */
-function theme_twitter_block_tweets($variables) {
-  $tweet = $variables['tweet'];
-  $text = twitter_block_linkify($tweet->text);
-  $user_image = ($variables['api'] == 'rest') ? $tweet->user->profile_image_url : $tweet->profile_image_url;
-  $user_name = ($variables['api'] == 'rest') ? $tweet->user->screen_name : $tweet->from_user;
-  $html = <<<EOHTML
-<div class="twitter_block tweet">
-  <div class="twitter_block_user">
-    <a class="twitter_block profile_image" href="http://twitter.com/{$user_name}">
-      <img src="{$user_image}" alt="Twitter Avatar" />
-      <span class="twitter_block_user_name">@{$user_name}</span>
-    </a>
-  </div>
-  <div class="tweet_text"><p class="tweet">{$text}</p></div>
-</div>
-EOHTML;
-
-  return $html;
+function twitter_block_preprocess_twitter_block_tweet(&$variables) {
+  $variables['text'] = twitter_block_linkify($variables['tweet']->text);
+  $variables['user_image'] = ($variables['api'] == 'rest') ? $variables['tweet']->user->profile_image_url : $variables['tweet']->profile_image_url;
+  $variables['user_name'] = ($variables['api'] == 'rest') ? $variables['tweet']->user->screen_name : $variables['tweet']->from_user;
 }
 
 /**
@@ -266,7 +254,7 @@ EOHTML;
 function theme_twitter_block($variables) {
   $twitter_result = $variables['twitter_result'];
   foreach($twitter_result as $tweet) {  
-    $tweets[] = theme('twitter_block_tweets', array('tweet' => $tweet, 'api' => $variables['api'])); 
+    $tweets[] = theme('twitter_block_tweet', array('tweet' => $tweet, 'api' => $variables['api'])); 
   }
 
   // Don't show an empty block.
