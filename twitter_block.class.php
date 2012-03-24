@@ -163,6 +163,9 @@ class TwitterBlockSearch {
   function search() {
     $this->url_query .= drupal_http_build_query($this->options);
     $ch = curl_init($this->url_query);
+    if (variable_get('twitter_block_debug_mode', FALSE)) {
+      watchdog('Twitter Block', 'DEBUG: URL: twitter_block_url', array('twitter_block_url' => $this->url_query), WATCHDOG_NOTICE);
+    }
 
     // Applications must have a meaningful and unique User Agent. 
     curl_setopt($ch, CURLOPT_USERAGENT, "Drupal Twitter Block Module");
@@ -173,6 +176,10 @@ class TwitterBlockSearch {
     $this->http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
     curl_close($ch);
+
+    if (variable_get('twitter_block_debug_mode', FALSE)) {
+      watchdog('Twitter Block', 'DEBUG: Returned data: returned_tweet_data', array('returned_tweet_data' => print_r($twitter_data, TRUE)), WATCHDOG_NOTICE);
+    }
 
     return $twitter_data;
   }
