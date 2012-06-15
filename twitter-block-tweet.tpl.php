@@ -1,6 +1,6 @@
 <div class="twitter_block tweet">
   <div class="twitter_block_user">
-    <a class="twitter_block profile_image" href="http://twitter.com/<?php echo $user_image; ?>">
+    <a class="twitter_block profile_image" href="http://twitter.com/<?php echo $user_name; ?>">
       <img src="<?php echo $user_image; ?>" alt="Twitter Avatar" />
       <span class="twitter_block_user_name"><?php echo $user_name; ?></span>
     </a>
