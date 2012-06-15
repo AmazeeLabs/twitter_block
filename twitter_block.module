@@ -259,7 +259,7 @@ function theme_twitter_block($variables) {
 
   // Don't show an empty block.
   if (count($twitter_result) > 0) {
-    $html = '<div id="twitter_block_results" class="twitter_block">';
+    $html = '<div id="twitter_block_results" class="twitter_block clearfix">';
     $html .= theme('item_list', array('items' => $tweets));
     $html .= '</div>';
     return $html;
