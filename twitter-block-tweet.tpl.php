@@ -12,7 +12,7 @@
  * - $text: The tweet's text.
  */
 ?>
-<div class="twitter_block tweet">
+<div class="clearfix tweet twitter_block">
   <div class="twitter_block_user">
     <a class="twitter_block profile_image" href="http://twitter.com/<?php echo $user_name; ?>">
       <img src="<?php echo $user_image; ?>" alt="Twitter Avatar" />

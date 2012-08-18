@@ -174,31 +174,15 @@ function twitter_block_block_view($delta) {
   // Load the configuration.
   $config = twitter_block_get_config($delta);
 
-  // Define the configuration.
-  $block = array();
-  $block['subject'] = t($config['default_title']);
-  $block['content'] = twitter_block_load_tweets($config);
-
-  return $block;
-}
-
-/**
- * Grab data from Twitter, store it for later.
- * @param $config An array suitable for passing to the TwitterBlockSearch object.
- * @return Themed output.
- */
-function twitter_block_load_tweets($config) {
-  module_load_include('php', 'twitter_block', 'twitter_block.class');
-
-  // We use the MD5 of the block config as cache cid.
+  // Use the MD5 of the block config as the cache cid.
   $cid = 'twitter_block_feed_' . md5(serialize($config));
   $cache_bin = 'cache';
 
   // Build the object.
   $twitter = new TwitterBlockSearch($config);
 
-  // We cache response even if it's empty so an empty response cannot cause a
-  // performance problem by making us contact Twitter in every request
+  // Cache the response, even if it's empty, to prevent performance problems
+  // caused by contacting Twitter every request.
   if ($cache = cache_get($cid, $cache_bin)) {
     $results = $cache->data;
   }
@@ -220,7 +204,27 @@ function twitter_block_load_tweets($config) {
     cache_set($cid, $results, $cache_bin, CACHE_TEMPORARY);
   }
 
-  return theme('twitter_block', array('twitter_result' => $results, 'api' => $twitter->getApi()));
+  // Create a variable to hold the tweets.
+  $tweets = array();
+
+  // Theme each of the returned tweets.
+  foreach($results as $tweet) {
+    $tweets[] = theme('twitter_block_tweet', array('tweet' => $tweet, 'api' => $twitter->getApi()));
+  }
+
+  $block = array();
+  $block['subject'] = t($config['default_title']);
+  $block['content'] = array(
+    '#theme' => 'item_list',
+    '#items' => $tweets,
+    '#attached' => array(
+      'css' => array(
+        drupal_get_path('module', 'twitter_block') . '/twitter_block.css',
+      ),
+    ),
+  );
+
+  return $block;
 }
 
 /**
@@ -228,13 +232,10 @@ function twitter_block_load_tweets($config) {
  */
 function twitter_block_theme($existing, $type , $theme, $path) {
   return array(
-    'twitter_block' => array(
-      'variables' => array('twitter_result' => NULL, 'api' => NULL),
-    ),
     'twitter_block_tweet' =>array(
       'variables' => array('tweet' => NULL, 'api' => NULL),
       'path' => drupal_get_path('module', 'twitter_block'),
-      'template' => 'twitter-block-tweet'
+      'template' => 'twitter-block-tweet',
     ),
   );
 }
@@ -246,24 +247,6 @@ function twitter_block_preprocess_twitter_block_tweet(&$variables) {
   $variables['text'] = twitter_block_linkify($variables['tweet']->text);
   $variables['user_image'] = ($variables['api'] == 'rest') ? $variables['tweet']->user->profile_image_url : $variables['tweet']->profile_image_url;
   $variables['user_name'] = ($variables['api'] == 'rest') ? $variables['tweet']->user->screen_name : $variables['tweet']->from_user;
-}
-
-/**
- * Returns themed HTML for a Twitter block.
- */
-function theme_twitter_block($variables) {
-  $twitter_result = $variables['twitter_result'];
-  foreach($twitter_result as $tweet) {  
-    $tweets[] = theme('twitter_block_tweet', array('tweet' => $tweet, 'api' => $variables['api'])); 
-  }
-
-  // Don't show an empty block.
-  if (count($twitter_result) > 0) {
-    $html = '<div id="twitter_block_results" class="twitter_block clearfix">';
-    $html .= theme('item_list', array('items' => $tweets));
-    $html .= '</div>';
-    return $html;
-  }
 }
 
 /**
