@@ -31,34 +31,34 @@ function twitter_block_requirements($phase) {
  */
 function twitter_block_schema() {
   $schema['twitter_block'] = array(
-    'description' => 'The table for storing twitter blocks.', 
+    'description' => 'The table for storing twitter blocks.',
     'fields' => array(
       'delta' => array(
-        'description' => 'The machine identifier for a twitter block.', 
-        'type' => 'varchar', 
+        'description' => 'The machine identifier for a twitter block.',
+        'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
         'default' => '',
-      ), 
+      ),
       'search_type' => array(
-        'description' => 'The search type for this block. ie. mention, reply', 
-        'type' => 'varchar', 
-        'length' => 32, 
-        'not null' => TRUE, 
+        'description' => 'The search type for this block. ie. mention, reply',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
         'default' => 'search',
-      ), 
+      ),
       'search_string' => array(
-        'description' => "The search string.",
+        'description' => 'The search string.',
         'type' => 'varchar',
         'length' => 140,
         'not null' => TRUE,
         'default' => '',
       ),
       'default_title' => array(
-        'description' => 'The title of this block in plain text.', 
-        'type' => 'varchar', 
-        'length' => 140, 
-        'not null' => TRUE, 
+        'description' => 'The title of this block in plain text.',
+        'type' => 'varchar',
+        'length' => 140,
+        'not null' => TRUE,
         'default' => '',
       ),
       'results_per_page' => array(
@@ -69,20 +69,21 @@ function twitter_block_schema() {
       'lang' => array(
         'description' => 'Optional Twitter language filter.',
         'type' => 'varchar',
-        'length' => '8', // Technically we only need 2...
+        'length' => 2,
       ),
-    ), 
+    ),
     'unique keys' => array(
       'delta' => array('delta'),
-    ), 
+    ),
     'foreign keys' => array(
       'block' => array(
-        'table' => 'block', 
+        'table' => 'block',
         'columns' => array('bid' => 'bid'),
-      ), 
-    ), 
+      ),
+    ),
     'primary key' => array('delta'),
   );
+
   return $schema;
 }
 
@@ -107,12 +108,31 @@ function twitter_block_uninstall() {
 }
 
 /**
- * Implements hook_update_N().
+ * Add a language field to the {twitter_block} table.
  */
 function twitter_block_update_7100() {
-  db_add_field('twitter_block', 'lang', array(
+  $new_field = array(
     'description' => 'Optional Twitter language filter.',
     'type' => 'varchar',
-    'length' => '6',
-  ));
+    'length' => 6,
+  );
+
+  db_add_field('twitter_block', 'lang', $new_field);
+
+  return t('Added a language field to the {twitter_block} table.');
+}
+
+/**
+ * Change the length of the language field.
+ */
+function twitter_block_update_7101() {
+  $new_field = array(
+    'description' => 'Optional Twitter language filter.',
+    'type' => 'varchar',
+    'length' => 2,
+  );
+
+  db_change_field('twitter_block', 'lang', 'lang', $new_field);
+
+  return t('Changed the length of the language field.');
 }
