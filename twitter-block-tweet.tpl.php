@@ -1,3 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Default theme implementation for displaying a tweet.
+ *
+ * A list of tweets are displayed inside of the twitter block.
+ *
+ * Available variables:
+ * - $user_name: The screen name of the tweet's author.
+ * - $user_image: A URL to the tweet's author's profile picture.
+ * - $text: The tweet's text.
+ */
+?>
 <div class="twitter_block tweet">
   <div class="twitter_block_user">
     <a class="twitter_block profile_image" href="http://twitter.com/<?php echo $user_name; ?>">
