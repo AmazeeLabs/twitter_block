@@ -38,7 +38,7 @@ function twitter_block_permission() {
 function twitter_block_get_config($delta) {
   static $config;
   if (!isset($config[$delta])) {
-    $result = db_query("SELECT search_type, search_string, default_title, results_per_page, lang" .
+    $result = db_query("SELECT search_type, include_rts, search_string, default_title, results_per_page, lang" .
       " FROM {twitter_block} WHERE delta = :delta", array(':delta' => $delta));
 
     // @todo There can be only one?
@@ -114,6 +114,11 @@ function twitter_block_block_configure($delta) {
     ),
     '#default_value' => $config['search_type'],
   );
+  $form['twitter_block_' . $delta]['include_rts'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Include retweets'),
+    '#default_value' => $config['include_rts'],
+  );
   $form['twitter_block_' . $delta]['lang'] = array(
     '#type'  => 'textfield',
     '#title' => 'Language',
@@ -159,6 +164,7 @@ function twitter_block_block_save($delta = '', $edit = array()) {
   db_update('twitter_block')
     ->fields(array(
       'search_type' => $edit['search_type'],
+      'include_rts' => $edit['include_rts'],
       'search_string' => $edit['search_string'],
       'results_per_page' => $edit['results_per_page'],
       'lang' => $edit['lang'],

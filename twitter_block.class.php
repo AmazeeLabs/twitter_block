@@ -30,6 +30,7 @@ class TwitterBlockSearch {
   // What were we looking for again?
   private $search_string;
   private $twitter_name;
+  private $include_rts;
 
   // The API type we'll pull data from.
   private $api;
@@ -50,6 +51,8 @@ class TwitterBlockSearch {
     else {
       $this->twitter_name = $config['search_string'];
     }
+
+    $this->include_rts = $config['include_rts'];
 
     $count = ($this->api == 'rest') ? 'count' : 'rpp';
     // The number of tweets to return per page.
@@ -109,6 +112,7 @@ class TwitterBlockSearch {
    */
   private function getTweetsFrom() {
     $this->options['screen_name'] = $this->twitter_name;
+    $this->options['include_rts'] = $this->include_rts;
     // @todo: Make this URL a configurable option.
     $this->url_query = 'http://api.twitter.com/1/statuses/user_timeline.json?';
     $json = $this->search();
