@@ -6,22 +6,6 @@
  */
 
 /**
- * Implements hook_menu().
- *
- * Provides a page for configuring new blocks.
- */
-function twitter_block_menu() {
-  $items['admin/config/services/twitter_block'] = array(
-    'title' => 'Configure Twitter Block(s)',
-    'description' => 'Create and configure Twitter search blocks.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('twitter_block_admin_form'),
-    'access arguments' => array('administer twitter blocks'),
-  );
-  return $items;
-}
-
-/**
  * Implements hook_permission().
  */
 function twitter_block_permission() {
@@ -47,22 +31,6 @@ function twitter_block_get_config($delta) {
     }
   }
   return isset($config[$delta]) ? $config[$delta] : FALSE;
-}
-
-/**
- * The configuration form for Twitter blocks.
- *
- * @todo Finish this form so we can add and configure multiple blocks.
- */
-function twitter_block_admin_form() {
-  $form = array();
-  $result = db_query("SELECT delta FROM {twitter_block}");
-
-  $form['Submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save Blocks'),
-  );
-  return $form;
 }
 
 /**
