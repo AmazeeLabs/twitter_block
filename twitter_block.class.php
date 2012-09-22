@@ -5,10 +5,11 @@
  * Lightweight implementation of the Twitter API in PHP.
  *
  * This code does the heavy lifting behind the Drupal twitter_block module. It
- * does not aim to authenticate users nor provide complex integration. We only 
- * need to grab public feeds, and as such we use the Twitter Search API. For 
- * more information on the twitter search API, @see 
- * @link http://dev.twitter.com/doc/get/search
+ * does not aim to authenticate users nor provide complex integration. We only
+ * need to grab public feeds, and as such we use the Twitter Search API. More
+ * information on the twitter search API can be found at the
+ * @link http://dev.twitter.com/doc/get/search GET search @endlink API resource
+ * documentation.
  */
 
 /**
@@ -102,11 +103,12 @@ class TwitterBlockSearch {
         $return['results'] = $data;
       }
     }
+
     return $return;
   }
 
   /**
-   * Returns the most recent tweets from $twittername 
+   * Returns the most recent tweets from $twittername
    * @param string $twittername to search. Note: begins with @
    * @return string $json JSON encoded search response
    */
@@ -116,6 +118,7 @@ class TwitterBlockSearch {
     // @todo: Make this URL a configurable option.
     $this->url_query = 'http://api.twitter.com/1/statuses/user_timeline.json?';
     $json = $this->search();
+
     return $json;
   }
 
@@ -127,28 +130,31 @@ class TwitterBlockSearch {
   private function getMentions() {
     $this->options['q'] = "@$this->twitter_name";
     $json = $this->search();
+
     return $json;
   }
 
   /**
    * Returns the most recent @replies to $twittername.
-   * @param string $twittername to search. Note: begins with @. 
+   * @param string $twittername to search. Note: begins with @.
    * @return string JSON encoded search response
    */
   private function getReplies() {
     $this->options['q'] = "to:$this->twitter_name";
     $json = $this->search();
+
     return $json;
   }
 
   /**
    * Returns the most recent tweets containing a string or hashtag.
-   * @param string $hashtag to search. May or may not begin with #. 
+   * @param string $hashtag to search. May or may not begin with #.
    * @return string JSON encoded search response
    */
   private function searchHashtag() {
     $this->options['q'] = ($this->search_string);
     $json = $this->search();
+
     return $json;
   }
 
@@ -171,7 +177,7 @@ class TwitterBlockSearch {
       watchdog('Twitter Block', 'DEBUG: URL: twitter_block_url', array('twitter_block_url' => $this->url_query), WATCHDOG_NOTICE);
     }
 
-    // Applications must have a meaningful and unique User Agent. 
+    // Applications must have a meaningful and unique User Agent.
     curl_setopt($ch, CURLOPT_USERAGENT, "Drupal Twitter Block Module");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));

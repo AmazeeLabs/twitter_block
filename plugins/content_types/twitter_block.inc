@@ -22,6 +22,7 @@ $plugin = array(
 function twitter_block_content_type_render($subtype, $conf, $args) {
   $block = new stdClass();
   $block->content = twitter_block_load_tweets($conf);
+
   return $block;
 }
 
@@ -53,11 +54,7 @@ function twitter_block_content_type_edit_form($form, &$form_state) {
   $form['lang'] = array(
     '#type'  => 'textfield',
     '#title' => 'Language',
-    '#description'  => t('If you would like to limit the search by a language, '.
-            'you can set it here. This should be the specific string expected by '.
-            'Twitter for your language. See the Twitter advanced search page for '.
-            'more information. (Hint: English is "en"). Leave blank if you don\'t '.
-            'want to filter by language at all.'),
+    '#description' => t('If you would like to limit the search by a language, you can set it here. This should be the specific string expected by Twitter for your language. See the Twitter advanced search page for more information. (Hint: English is "en"). Leave blank if you don\'t want to filter by language at all.'),
     '#size'  => 12,
     '#default_value' => $conf['lang'],
   );
@@ -95,7 +92,7 @@ function twitter_block_content_type_admin_info($subtype, $conf) {
   );
 
   $block = twitter_block_content_type_render($subtype, $conf, array());
-  $block->title = $strings[$conf['search_type']] .' <strong>('. $conf['search_string'] .')</strong>';
+  $block->title = $strings[$conf['search_type']] . ' <strong>(' . $conf['search_string'] . ')</strong>';
 
   return $block;
 }
