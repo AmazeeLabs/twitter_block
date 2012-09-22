@@ -216,6 +216,7 @@ function twitter_block_theme($existing, $type , $theme, $path) {
  */
 function twitter_block_preprocess_twitter_block_tweet(&$variables) {
   $variables['text'] = twitter_block_linkify($variables['tweet']->text);
+  $variables['date'] = format_date(strtotime($variables['tweet']->created_at));
   $variables['user_image'] = ($variables['api'] == 'rest') ? $variables['tweet']->user->profile_image_url : $variables['tweet']->profile_image_url;
   $variables['user_name'] = ($variables['api'] == 'rest') ? $variables['tweet']->user->screen_name : $variables['tweet']->from_user;
 }

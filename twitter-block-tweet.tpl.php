@@ -9,6 +9,7 @@
  * Available variables:
  * - $user_name: The screen name of the tweet's author.
  * - $user_image: A URL to the tweet's author's profile picture.
+ * - $date: The tweet's creation date.
  * - $text: The tweet's text.
  */
 ?>
@@ -19,5 +20,6 @@
       <span class="twitter_block_user_name"><?php echo $user_name; ?></span>
     </a>
   </div>
+  <div class="tweet_date"><?php echo $date; ?></div>
   <div class="tweet_text"><p class="tweet"><?php echo $text; ?></p></div>
 </div>
