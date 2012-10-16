@@ -171,27 +171,28 @@ class TwitterBlockSearch {
    * @return string JSON encoded search response.
    */
   function search() {
+    // Build a URL query to send to Twitter
     $this->url_query .= drupal_http_build_query($this->options);
-    $ch = curl_init($this->url_query);
+
     if (variable_get('twitter_block_debug_mode', FALSE)) {
       watchdog('Twitter Block', 'DEBUG: URL: twitter_block_url', array('twitter_block_url' => $this->url_query), WATCHDOG_NOTICE);
     }
 
-    // Applications must have a meaningful and unique User Agent.
-    curl_setopt($ch, CURLOPT_USERAGENT, "Drupal Twitter Block Module");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+    // Query Twitter
+    $twitter_data = drupal_http_request($this->url_query);
 
-    $twitter_data = curl_exec($ch);
-    $this->http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    // Set the response status code, or the error code if an error occurred
+    $this->http_status = $twitter_data->code;
 
-    curl_close($ch);
+    if (isset($twitter_data->error)) {
+      if (variable_get('twitter_block_debug_mode', FALSE)) {
+        watchdog('Twitter Block', 'DEBUG: Returned data: returned_tweet_data', array('returned_tweet_data' => print_r($twitter_data->error, TRUE)), WATCHDOG_NOTICE);
+      }
 
-    if (variable_get('twitter_block_debug_mode', FALSE)) {
-      watchdog('Twitter Block', 'DEBUG: Returned data: returned_tweet_data', array('returned_tweet_data' => print_r($twitter_data, TRUE)), WATCHDOG_NOTICE);
+      return;
     }
 
-    return $twitter_data;
+    return $twitter_data->data;
   }
 
   function getApi() {

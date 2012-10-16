@@ -6,27 +6,6 @@
  */
 
 /**
- * Implements hook_requirements().
- */
-function twitter_block_requirements($phase) {
-  $requirements = array();
-  $t = get_t();
-
-  $has_curl = function_exists('curl_init');
-
-  $requirements['twitter_block curl'] = array(
-    'title' => $t('cURL'),
-    'value' => $has_curl ? $t('Enabled') : $t('Not found'),
-  );
-  if (!$has_curl) {
-    $requirements['twitter_block curl']['severity'] = REQUIREMENT_ERROR;
-    $requirements['twitter_block curl']['description'] = $t('The testing framework could not be installed because the PHP <a href="@curl_url">cURL</a> library is not available.', array('@curl_url' => 'http://php.net/manual/en/curl.setup.php'));
-  }
-
-  return $requirements;
-}
-
-/**
  * Implements hook_schema().
  */
 function twitter_block_schema() {
