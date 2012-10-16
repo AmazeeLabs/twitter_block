@@ -151,28 +151,17 @@ function twitter_block_block_view($delta) {
 
   // Build the object.
   $twitter = new TwitterBlockSearch($config);
-
-  // Cache the response, even if it's empty, to prevent performance problems
-  // caused by contacting Twitter every request.
-  if ($cache = cache_get($cid, $cache_bin)) {
-    $results = $cache->data;
+  $response = $twitter->getJSON();
+  $results = array();
+  if (empty($response) || !is_array($response) || !isset($response['status']) || $response['status'] !== TRUE) {
+    watchdog('Twitter Block', 'Recieved an unexpected reply from Twitter. ' .
+      'Perhaps just a fail whale?<br/>' .
+      'URL: url_query<br />' .
+      'response', array('url_query' => $twitter->url_query, 'response' => print_r($response, TRUE)),
+      WATCHDOG_NOTICE);
   }
   else {
-    $response = $twitter->getJSON();
-    $results = array();
-    if (empty($response) || !is_array($response) || !isset($response['status']) || $response['status'] !== TRUE) {
-      watchdog('Twitter Block', 'Recieved an unexpected reply from Twitter. ' .
-        'Perhaps just a fail whale?<br/>' .
-        'URL: url_query<br />' .
-        'response', array('url_query' => $twitter->url_query, 'response' => print_r($response, TRUE)),
-        WATCHDOG_NOTICE);
-    }
-    else {
-      $results = $response['results'];
-    }
-
-    // Save the data for later.
-    cache_set($cid, $results, $cache_bin, CACHE_TEMPORARY);
+    $results = $response['results'];
   }
 
   // Create a variable to hold the tweets.
