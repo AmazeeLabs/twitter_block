@@ -54,35 +54,34 @@ function twitter_block_block_info() {
 /**
  * Implements hook_block_configure().
  */
-function twitter_block_block_configure($delta) {
+function twitter_block_block_configure($delta = '') {
   $config = twitter_block_get_config($delta);
-  $form = array();
 
+  $form = array();
   $form['twitter_block_' . $delta] = array(
     '#type' => 'fieldset',
-    '#title' => t('Twitter Block Configuration'),
+    '#title' => t('Twitter Block configuration'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
-    '#element_validate' => array('twitter_block_form_validate'),
   );
-
-  $form['twitter_block_' . $delta]['search_string'] = array(
-    '#type' => 'textfield',
-    '#title' => 'The string or username to search.',
-    '#size' => 32,
-    '#default_value' => $config['search_string'],
-  );
-
   $form['twitter_block_' . $delta]['search_type'] = array(
-    '#type' => 'select',
-    '#title' => t('Choose the type of Tweets to return.'),
+    '#type' => 'radios',
+    '#title' => t('Search type'),
     '#options' => array(
-      'searchHashtag' => t('Tweets mentioning #hashtag or search string'),
-      'getTweetsFrom' => t('Tweets sent from the Twitter user'),
-      'getReplies' => t('Replies to the Twitter user'),
-      'getMentions' => t('Tweets mentioning the Twitter user'),
+      'searchHashtag' => t('Tweets mentioning a hashtag or search string'),
+      'getTweetsFrom' => t('Tweets sent from a specific user'),
+      'getReplies' => t('Replies to the a specific user'),
+      'getMentions' => t('Tweets mentioning a specific user'),
     ),
     '#default_value' => $config['search_type'],
+    '#description' => t('Choose the method to use when searching tweets.'),
+  );
+  $form['twitter_block_' . $delta]['search_string'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Search query'),
+    '#default_value' => $config['search_string'],
+    '#description' => t('Enter a username, hashtag or search string depending on the currently selected search type.'),
+    '#maxlength' => 140,
   );
   $form['twitter_block_' . $delta]['include_rts'] = array(
     '#type' => 'checkbox',
@@ -91,35 +90,21 @@ function twitter_block_block_configure($delta) {
   );
   $form['twitter_block_' . $delta]['lang'] = array(
     '#type'  => 'textfield',
-    '#title' => 'Language',
-    '#description' => t('If you would like to limit the search by a language, you can set it here. This should be the specific string expected by twitter for your language. See the <a href="@language">twitter advanced search page</a> for more information. (Hint: English is "en"). Leave blank if you don\'t want to filter by language at all.', array('@language' => 'http://twitter.com/#!/search-advanced')),
-    '#size' => 12,
+    '#title' => t('Language'),
+    '#description' => t('Enter an <a href="@language-codes">ISO 639-1 language code</a>. Only tweets written in the specified language will be displayed. Note that Twitter only supports a limited number of languages (see the Twitter <a href="@search-page">advanced search page</a> for a list of currently supported languages). Leave blank to display tweets from all languages.', array('@language-codes' => 'http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes', '@search-page' => 'http://twitter.com/search-advanced')),
     '#default_value' => $config['lang'],
+    '#size' => 2,
+    '#maxlength' => 2,
   );
   $form['twitter_block_' . $delta]['results_per_page'] = array(
-    '#type' => 'textfield',
-    '#title' => 'Number of tweets to return',
-    '#description' => t('Please enter the number of tweets to return per page up to a maximum of 100.'),
-    '#size' => 12,
+    '#type' => 'select',
+    '#title' => t('Tweets'),
+    '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)),
     '#default_value' => $config['results_per_page'],
+    '#description' => t('Select the number of tweets to display.'),
   );
 
   return $form;
-}
-
-/**
- * Validates Twitter block configuration options before saving the form.
- */
-function twitter_block_form_validate($element, &$form_state) {
-  if (!empty($element['results_per_page']['#value']) ) {
-    if (!ctype_digit($element['results_per_page']['#value']) ) {
-      form_set_error('results_per_page', t('The number of results must be an integer.'));
-    }
-    // Twitter doesn't like to return more than 100 tweets.
-    elseif ($element['results_per_page']['#value'] > 100) {
-      form_set_error('results_per_page', t("The Twitter API limits the number of tweets returned to 100 or less."));
-    }
-  }
 }
 
 /**
