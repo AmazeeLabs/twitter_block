@@ -21,7 +21,7 @@
 }
 
 p.tweet {
-  clear: all;
+  clear: both;
   display: block;
   float: left;
 }
