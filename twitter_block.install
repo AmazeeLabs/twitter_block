@@ -12,12 +12,18 @@ function twitter_block_schema() {
   $schema['twitter_block'] = array(
     'description' => 'The table for storing twitter blocks.',
     'fields' => array(
-      'delta' => array(
-        'description' => 'The machine identifier for a twitter block.',
+      'bid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The block's {block}.bid.",
+      ),
+      'info' => array(
         'type' => 'varchar',
-        'length' => 32,
+        'length' => 128,
         'not null' => TRUE,
         'default' => '',
+        'description' => 'Block description.',
       ),
       'search_type' => array(
         'description' => 'The search type for this block. ie. mention, reply',
@@ -40,13 +46,6 @@ function twitter_block_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'default_title' => array(
-        'description' => 'The title of this block in plain text.',
-        'type' => 'varchar',
-        'length' => 140,
-        'not null' => TRUE,
-        'default' => '',
-      ),
       'results_per_page' => array(
         'description' => '"Returns per page" from the Twitter Search API.',
         'type' => 'varchar',
@@ -59,38 +58,31 @@ function twitter_block_schema() {
       ),
     ),
     'unique keys' => array(
-      'delta' => array('delta'),
+      'info' => array('info'),
     ),
-    'foreign keys' => array(
-      'block' => array(
-        'table' => 'block',
-        'columns' => array('bid' => 'bid'),
-      ),
-    ),
-    'primary key' => array('delta'),
+    'primary key' => array('bid'),
   );
 
   return $schema;
 }
 
 /**
- * Implements hook_install().
- */
-function twitter_block_install() {
-  $id = db_insert('twitter_block')->fields(array(
-      'delta' => 'default',
-      'search_type' => 'searchHashtag',
-      'search_string' => 'Drupal',
-      'default_title' => st('Discussions on Twitter'),
-    ))
-    ->execute();
-}
-
-/**
  * Implements hook_uninstall().
  */
 function twitter_block_uninstall() {
+  // Remove variables
   variable_del('twitter_block_default_results_per_page');
+
+  // Remove blocks
+  db_delete('block')
+    ->condition('module', 'twitter_block')
+    ->execute();
+  db_delete('block_role')
+    ->condition('module', 'twitter_block')
+    ->execute();
+
+  // Clear the site cache
+  cache_clear_all();
 }
 
 /**
