@@ -40,9 +40,9 @@ class TwitterBlockTestCase extends DrupalWebTestCase {
   function testTwitterBlock() {
     // Confirm that the add Twitter block link appears on block overview pages.
     $this->drupalGet('admin/structure/block');
-    $this->assertRaw(l('Add Twitter block', 'admin/structure/block/add-twitter-block'), 'Add Twitter block link is present on block overview page for default theme.');
+    $this->assertRaw(l(t('Add Twitter block'), 'admin/structure/block/add-twitter-block'), 'Add Twitter block link is present on block overview page for default theme.');
     $this->drupalGet('admin/structure/block/list/seven');
-    $this->assertRaw(l('Add Twitter block', 'admin/structure/block/list/seven/add-twitter-block'), 'Add Twitter block link is present on block overview page for non-default theme.');
+    $this->assertRaw(l(t('Add Twitter block'), 'admin/structure/block/list/seven/add-twitter-block'), 'Add Twitter block link is present on block overview page for non-default theme.');
 
     // Add a new custom Twitter block by filling out the input form on the admin/structure/block/add-twitter-block page.
     $twitter_block = array();
