@@ -130,10 +130,10 @@ function twitter_block_update_7102() {
 }
 
 /**
- * Remove the unnecessary 'results_per_page' variable.
+ * Remove the unnecessary "results_per_page" variable.
  */
 function twitter_block_update_7103() {
   variable_del('twitter_block_default_results_per_page');
 
-  return t('Removed the unnecessary 'results_per_page' variable.');
+  return t('Removed the unnecessary "results_per_page" variable.');
 }
