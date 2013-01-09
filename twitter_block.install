@@ -70,9 +70,6 @@ function twitter_block_schema() {
  * Implements hook_uninstall().
  */
 function twitter_block_uninstall() {
-  // Remove variables
-  variable_del('twitter_block_default_results_per_page');
-
   // Remove blocks
   db_delete('block')
     ->condition('module', 'twitter_block')
@@ -130,4 +127,13 @@ function twitter_block_update_7102() {
   db_add_field('twitter_block', 'include_rts', $new_field);
 
   return t('Added a retweet field to the {twitter_block} table.');
+}
+
+/**
+ * Remove the unnecessary 'results_per_page' variable.
+ */
+function twitter_block_update_7103() {
+  variable_del('twitter_block_default_results_per_page');
+
+  return t('Removed the unnecessary 'results_per_page' variable.');
 }

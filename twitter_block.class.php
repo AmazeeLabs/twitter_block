@@ -57,12 +57,7 @@ class TwitterBlockSearch {
 
     $count = ($this->api == 'rest') ? 'count' : 'rpp';
     // The number of tweets to return per page.
-    if (!empty($config['results_per_page'])) {
-      $this->options[$count] = $config['results_per_page'];
-    }
-    else {
-      $this->options[$count] = variable_get('twitter_block_default_results_per_page', 15);
-    }
+    $this->options[$count] = $config['results_per_page'];
 
     // Filter by language, but only if there is one set in the config.
     if (isset($config['lang']) && !empty($config['lang'])) {
