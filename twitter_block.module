@@ -314,7 +314,9 @@ function twitter_block_block_view($delta) {
     ),
     '#attached' => array(
       'js' => array(
-        drupal_get_path('module', 'twitter_block') . '/twitter_block.js',
+        'https://platform.twitter.com/widgets.js' => array(
+          'type' => 'external',
+        ),
       ),
     ),
   );
