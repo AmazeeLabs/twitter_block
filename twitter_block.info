@@ -4,4 +4,6 @@ core = 7.x
 
 files[] = tests/twitter_block.test
 
+configure = admin/structure/block
+
 dependencies[] = block
