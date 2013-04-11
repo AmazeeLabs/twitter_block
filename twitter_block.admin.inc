@@ -51,15 +51,25 @@ function twitter_block_add_block_form_validate($form, &$form_state) {
  * @see twitter_block_add_block_form_validate()
  */
 function twitter_block_add_block_form_submit($form, &$form_state) {
+  // The serialized 'data' column contains the timeline settings.
+  $data = array(
+    'widget_id' => $form_state['values']['widget_id'],
+    'theme' => $form_state['values']['theme'],
+    'link_color' => $form_state['values']['link_color'],
+    'width' => $form_state['values']['width'],
+    'height' => $form_state['values']['height'],
+    'chrome' => $form_state['values']['chrome'],
+    'border_color' => $form_state['values']['border_color'],
+    'language' => $form_state['values']['language'],
+    'related' => $form_state['values']['related'],
+    'polite' => $form_state['values']['polite'],
+  );
+
   // Save the block configuration
   $delta = db_insert('twitter_block')
     ->fields(array(
       'info' => $form_state['values']['info'],
-      'search_type' => $form_state['values']['search_type'],
-      'include_rts' => $form_state['values']['include_rts'],
-      'search_string' => $form_state['values']['search_string'],
-      'results_per_page' => $form_state['values']['results_per_page'],
-      'lang' => $form_state['values']['lang'],
+      'data' => serialize($data),
     ))
     ->execute();
 

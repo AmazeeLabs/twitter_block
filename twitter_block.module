@@ -120,7 +120,16 @@ function twitter_block_block_info() {
  */
 function twitter_block_block_configure($delta = 0) {
   if ($delta) {
-    $twitter_block = twitter_block_block_get($delta);
+    $config = twitter_block_block_get($delta);
+
+    // Unserialize the timeline settings.
+    $data = unserialize($config['data']);
+
+    // Remove the serialized timeline settings.
+    unset($config['data']);
+
+    // Add the timeline settings to the block settings.
+    $twitter_block = $config + $data;
   }
   else {
     $twitter_block = array();
@@ -141,12 +150,18 @@ function twitter_block_block_configure($delta = 0) {
 function twitter_block_custom_block_form($edit = array()) {
   $edit += array(
     'info' => '',
-    'search_type' => array(),
-    'search_string' => '',
-    'include_rts' => TRUE,
-    'lang' => '',
-    'results_per_page' => 10,
+    'widget_id' => '',
+    'theme' => '',
+    'link_color' => '',
+    'width' => '',
+    'height' => '',
+    'chrome' => '',
+    'border_color' => '',
+    'language' => '',
+    'related' => '',
+    'polite' => array(),
   );
+
   $form['info'] = array(
     '#type' => 'textfield',
     '#title' => t('Block description'),
@@ -155,51 +170,60 @@ function twitter_block_custom_block_form($edit = array()) {
     '#description' => t('A brief description of your block. Used on the <a href="@overview">Blocks administration page</a>.', array('@overview' => url('admin/structure/block'))),
     '#required' => TRUE,
   );
-  $form['configuration'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Twitter Block configuration'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-  );
-  $form['configuration']['search_type'] = array(
-    '#type' => 'radios',
-    '#title' => t('Search type'),
-    '#options' => array(
-      'searchHashtag' => t('Tweets mentioning a hashtag or search string'),
-      'getTweetsFrom' => t('Tweets sent from a specific user'),
-      'getReplies' => t('Replies to the a specific user'),
-      'getMentions' => t('Tweets mentioning a specific user'),
-    ),
-    '#default_value' => $edit['search_type'],
-    '#description' => t('Choose the method to use when searching tweets.'),
+  $form['widget_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Widget ID'),
+    '#default_value' => $edit['widget_id'],
     '#required' => TRUE,
   );
-  $form['configuration']['search_string'] = array(
+  $form['theme'] = array(
     '#type' => 'textfield',
-    '#title' => t('Search query'),
-    '#default_value' => $edit['search_string'],
-    '#description' => t('Enter a username, hashtag or search string depending on the currently selected search type.'),
-    '#maxlength' => 140,
+    '#title' => t('Theme'),
+    '#default_value' => $edit['theme'],
   );
-  $form['configuration']['include_rts'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Include retweets'),
-    '#default_value' => $edit['include_rts'],
+  $form['link_color'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Link color'),
+    '#default_value' => $edit['link_color'],
   );
-  $form['configuration']['lang'] = array(
-    '#type'  => 'textfield',
+  $form['width'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Width'),
+    '#default_value' => $edit['width'],
+  );
+  $form['height'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Height'),
+    '#default_value' => $edit['height'],
+  );
+  $form['chrome'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Chrome'),
+    '#default_value' => $edit['chrome'],
+  );
+  $form['border_color'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Border color'),
+    '#default_value' => $edit['border_color'],
+  );
+  $form['language'] = array(
+    '#type' => 'textfield',
     '#title' => t('Language'),
-    '#description' => t('Enter an <a href="@language-codes">ISO 639-1 language code</a>. Only tweets written in the specified language will be displayed. Note that Twitter only supports a limited number of languages (see the Twitter <a href="@search-page">advanced search page</a> for a list of currently supported languages). Leave blank to display tweets from all languages.', array('@language-codes' => 'http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes', '@search-page' => 'http://twitter.com/search-advanced')),
-    '#default_value' => $edit['lang'],
-    '#size' => 2,
-    '#maxlength' => 2,
+    '#default_value' => $edit['language'],
   );
-  $form['configuration']['results_per_page'] = array(
+  $form['related'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Related users'),
+    '#default_value' => $edit['related'],
+  );
+  $form['polite'] = array(
     '#type' => 'select',
-    '#title' => t('Tweets'),
-    '#options' => drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)),
-    '#default_value' => $edit['results_per_page'],
-    '#description' => t('Select the number of tweets to display.'),
+    '#title' => t('ARIA politeness'),
+    '#options' => array(
+      'polite' => t('Polite'),
+      'assertive' => t('Assertive'),
+    ),
+    '#default_value' => $edit['polite'],
   );
 
   return $form;
@@ -230,17 +254,29 @@ function twitter_block_block_save($delta = 0, $edit = array()) {
  *   Always returns TRUE.
  */
 function twitter_block_custom_block_save($edit, $delta) {
-  db_update('twitter_block')
+  // The serialized 'data' column contains the timeline settings.
+  $data = array(
+    'widget_id' => $edit['widget_id'],
+    'theme' => $edit['theme'],
+    'link_color' => $edit['link_color'],
+    'width' => $edit['width'],
+    'height' => $edit['height'],
+    'chrome' => $edit['chrome'],
+    'border_color' => $edit['border_color'],
+    'language' => $edit['language'],
+    'related' => $edit['related'],
+    'polite' => $edit['polite'],
+  );
+
+  // Save the block configuration
+  $delta = db_update('twitter_block')
     ->fields(array(
       'info' => $edit['info'],
-      'search_type' => $edit['search_type'],
-      'include_rts' => $edit['include_rts'],
-      'search_string' => $edit['search_string'],
-      'results_per_page' => $edit['results_per_page'],
-      'lang' => $edit['lang'],
+      'data' => serialize($data),
     ))
     ->condition('bid', $delta)
     ->execute();
+
   return TRUE;
 }
 
@@ -251,105 +287,37 @@ function twitter_block_block_view($delta) {
   // Load the configuration.
   $config = twitter_block_block_get($delta);
 
-  // Use the MD5 of the block config as the cache cid.
-  $cid = 'twitter_block_feed_' . md5(serialize($config));
-  $cache_bin = 'cache';
-
-  // Build the object.
-  $twitter = new TwitterBlockSearch($config);
-  $response = $twitter->getJSON();
-  $results = array();
-  if (empty($response) || !is_array($response) || !isset($response['status']) || $response['status'] !== TRUE) {
-    watchdog('Twitter Block', 'Recieved an unexpected reply from Twitter. ' .
-      'Perhaps just a fail whale?<br/>' .
-      'URL: url_query<br />' .
-      'response', array('url_query' => $twitter->url_query, 'response' => print_r($response, TRUE)),
-      WATCHDOG_NOTICE);
-  }
-  else {
-    $results = $response['results'];
-  }
-
-  // Create a variable to hold the tweets.
-  $tweets = array();
-
-  // Theme each of the returned tweets.
-  foreach ($results as $tweet) {
-    $tweets[] = theme('twitter_block_tweet', array('tweet' => $tweet, 'api' => $twitter->getApi()));
-  }
+  // Unserialize the timeline 
+  $data = unserialize($config['data']);
 
   $block = array();
   $block['subject'] = check_plain($config['info']);
   $block['content'] = array(
-    '#theme' => 'item_list',
-    '#items' => $tweets,
+    '#theme' => 'link',
+    '#text' => 'Tweets by @twitterapi',
+    '#path' => 'https://twitter.com/twitterapi',
+    '#options' => array(
+      'attributes' => array(
+        'class' => array('twitter-timeline'),
+        'data-widget-id' => $data['widget_id'],
+        'data-theme' => $data['theme'],
+        'data-link-color' => $data['link_color'],
+        'width' => $data['width'],
+        'height' => $data['height'],
+        'chrome' => $data['chrome'],
+        'data-border-color' => $data['border_color'],
+        'language' => $data['language'],
+        'data-related' => $data['language'],
+        'aria-polite' => $data['polite'],
+      ),
+      'html' => FALSE,
+    ),
     '#attached' => array(
-      'css' => array(
-        drupal_get_path('module', 'twitter_block') . '/twitter_block.css',
+      'js' => array(
+        drupal_get_path('module', 'twitter_block') . '/twitter_block.js',
       ),
     ),
   );
 
   return $block;
-}
-
-/**
- * Implements hook_theme().
- */
-function twitter_block_theme($existing, $type , $theme, $path) {
-  return array(
-    'twitter_block_tweet' => array(
-      'variables' => array('tweet' => NULL, 'api' => NULL),
-      'path' => drupal_get_path('module', 'twitter_block'),
-      'template' => 'twitter-block-tweet',
-    ),
-  );
-}
-
-/**
- * Implements hook_preprocess().
- */
-function twitter_block_preprocess_twitter_block_tweet(&$variables) {
-  $variables['text'] = twitter_block_linkify($variables['tweet']->text);
-  $variables['date'] = format_date(strtotime($variables['tweet']->created_at));
-  $variables['user_image'] = ($variables['api'] == 'rest') ? $variables['tweet']->user->profile_image_url : $variables['tweet']->profile_image_url;
-  $variables['name'] = ($variables['api'] == 'rest') ? $variables['tweet']->user->name : $variables['tweet']->from_user_name;
-  $variables['screen_name'] = ($variables['api'] == 'rest') ? $variables['tweet']->user->screen_name : $variables['tweet']->from_user;
-}
-
-/**
- * Convert nested URLs, account names and hash tags into links.
- */
-function twitter_block_linkify($status_text) {
-  // Linkify URLs.
-  $status_text = preg_replace(
-    '/(https?:\/\/\S+)/',
-    '<a href="\1">\1</a>',
-    $status_text
-  );
-
-  // Linkify twitter users.
-  $status_text = preg_replace(
-    '/(^|\s)@(\w+)/',
-    '\1@<a href="http://twitter.com/\2">\2</a>',
-    $status_text
-  );
-
-  // Linkify tags.
-  $status_text = preg_replace(
-    '/(^|\s)#([\wåäöÅÄÖ]+)/',
-    '\1#<a href="http://search.twitter.com/search?q=%23\2">\2</a>',
-    $status_text
-  );
-
-  return $status_text;
-}
-
-/**
- * Implements hook_ctools_plugin_directory().
- */
-function twitter_block_ctools_plugin_directory($module, $plugin) {
-  if ($module == 'ctools') {
-    return 'plugins/' . $plugin;
-  }
 }
