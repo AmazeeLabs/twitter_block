@@ -155,7 +155,7 @@ function twitter_block_custom_block_form($edit = array()) {
     'link_color' => '',
     'width' => '',
     'height' => '',
-    'chrome' => '',
+    'chrome' => array(),
     'border_color' => '',
     'language' => '',
     'related' => '',
@@ -177,39 +177,61 @@ function twitter_block_custom_block_form($edit = array()) {
     '#required' => TRUE,
   );
   $form['theme'] = array(
-    '#type' => 'textfield',
+    '#type' => 'select',
     '#title' => t('Theme'),
     '#default_value' => $edit['theme'],
+    '#options' => array(
+      '' => t('Default'),
+      'dark' => t('Dark'),
+    ),
   );
   $form['link_color'] = array(
     '#type' => 'textfield',
     '#title' => t('Link color'),
     '#default_value' => $edit['link_color'],
+    '#maxlength' => 6,
+    '#size' => 6,
+    '#field_prefix' => '#',
   );
   $form['width'] = array(
     '#type' => 'textfield',
     '#title' => t('Width'),
     '#default_value' => $edit['width'],
+    '#size' => 6,
+    '#field_suffix' => 'px',
   );
   $form['height'] = array(
     '#type' => 'textfield',
     '#title' => t('Height'),
     '#default_value' => $edit['height'],
+    '#size' => 6,
+    '#field_suffix' => 'px',
   );
   $form['chrome'] = array(
-    '#type' => 'textfield',
+    '#type' => 'checkboxes',
     '#title' => t('Chrome'),
     '#default_value' => $edit['chrome'],
+    '#options' => array(
+      'noheader' => t('No header'),
+      'nofooter' => t('No footer'),
+      'noborders' => t('No borders'),
+      'transparent' => t('Transparent'),
+    ),
   );
   $form['border_color'] = array(
     '#type' => 'textfield',
     '#title' => t('Border color'),
     '#default_value' => $edit['border_color'],
+    '#maxlength' => 6,
+    '#size' => 6,
+    '#field_prefix' => '#',
   );
   $form['language'] = array(
     '#type' => 'textfield',
     '#title' => t('Language'),
     '#default_value' => $edit['language'],
+    '#maxlength' => 5,
+    '#size' => 5,
   );
   $form['related'] = array(
     '#type' => 'textfield',
@@ -301,12 +323,12 @@ function twitter_block_block_view($delta) {
         'class' => array('twitter-timeline'),
         'data-widget-id' => $data['widget_id'],
         'data-theme' => $data['theme'],
-        'data-link-color' => $data['link_color'],
+        'data-link-color' => !empty($data['link_color']) ? '#' . $data['link_color'] : $data['link_color'],
         'width' => $data['width'],
         'height' => $data['height'],
-        'chrome' => $data['chrome'],
-        'data-border-color' => $data['border_color'],
-        'language' => $data['language'],
+        'data-chrome' => !empty($data['chrome']) ? implode(' ', array_keys($data['chrome'])) : $data['chrome'],
+        'data-border-color' => !empty($data['border_color']) ? '#' . $data['border_color'] : $data['border_color'],
+        'lang' => $data['language'],
         'data-related' => $data['language'],
         'aria-polite' => $data['polite'],
       ),
