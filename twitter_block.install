@@ -65,3 +65,27 @@ function twitter_block_uninstall() {
   // Clear the site cache
   cache_clear_all();
 }
+
+/**
+ * Remove any old Twitter Block blocks and install the new Twitter Block schema.
+ */
+function twitter_block_update_7200() {
+  // Remove old Twitter Block schema
+  drupal_uninstall_schema('twitter_block');
+
+  // Remove any old Twitter Block blocks
+  db_delete('block')
+    ->condition('module', 'twitter_block')
+    ->execute();
+  db_delete('block_role')
+    ->condition('module', 'twitter_block')
+    ->execute();
+
+  // Clear the site cache
+  cache_clear_all();
+
+  // Install the new Twitter Block schema
+  drupal_install_schema('twitter_block');
+
+  return t('Removed any old Twitter Block blocks and installed the new Twitter Block schema.');
+}
