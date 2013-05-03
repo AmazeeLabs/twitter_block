@@ -25,6 +25,13 @@ function twitter_block_schema() {
         'default' => '',
         'description' => 'Block description.',
       ),
+      'widget_id' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Widget ID.',
+      ),
       'data' => array(
         'type' => 'blob',
         'size' => 'big',
@@ -35,6 +42,7 @@ function twitter_block_schema() {
     ),
     'unique keys' => array(
       'info' => array('info'),
+      'widget_id' => array('widget_id'),
     ),
     'primary key' => array('bid'),
   );

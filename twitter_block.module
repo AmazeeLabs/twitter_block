@@ -92,11 +92,16 @@ function twitter_block_form_block_admin_display_form_alter(&$form, &$form_state,
  *   Array keys:
  *   - bid: Block ID.
  *   - info: Block description.
- *   - search_type: Type of search to perform.
- *   - include_rts: Whether to include retweets.
- *   - search_string: String to search for.
- *   - results_per_page: Number of tweets to display.
- *   - lang: Language to restrict tweets to.
+ *   - widget_id: Widget ID.
+ *   - theme: Theme.
+ *   - link_color: Link color.
+ *   - width: Width.
+ *   - height: Height.
+ *   - chrome: Chrome.
+ *   - border_color: Border color.
+ *   - language: Language.
+ *   - related: Related users.
+ *   - polite: ARIA politeness.
  */
 function twitter_block_block_get($bid) {
   return db_query("SELECT * FROM {twitter_block} WHERE bid = :bid", array(':bid' => $bid))->fetchAssoc();
@@ -264,11 +269,16 @@ function twitter_block_block_save($delta = 0, $edit = array()) {
  * @param $edit
  *   Associative array of fields to save. Array keys:
  *   - info: Block description.
- *   - search_type: Type of search to perform.
- *   - include_rts: Whether to include retweets.
- *   - search_string: String to search for.
- *   - results_per_page: Number of tweets to display.
- *   - lang: Language to restrict tweets to.
+ *   - widget_id: Widget ID.
+ *   - theme: Theme.
+ *   - link_color: Link color.
+ *   - width: Width.
+ *   - height: Height.
+ *   - chrome: Chrome.
+ *   - border_color: Border color.
+ *   - language: Language.
+ *   - related: Related users.
+ *   - polite: ARIA politeness.
  * @param $delta
  *   Block ID of the block to save.
  *
@@ -278,7 +288,6 @@ function twitter_block_block_save($delta = 0, $edit = array()) {
 function twitter_block_custom_block_save($edit, $delta) {
   // The serialized 'data' column contains the timeline settings.
   $data = array(
-    'widget_id' => $edit['widget_id'],
     'theme' => $edit['theme'],
     'link_color' => $edit['link_color'],
     'width' => $edit['width'],
@@ -294,6 +303,7 @@ function twitter_block_custom_block_save($edit, $delta) {
   $delta = db_update('twitter_block')
     ->fields(array(
       'info' => $edit['info'],
+      'widget_id' => $edit['widget_id'],
       'data' => serialize($data),
     ))
     ->condition('bid', $delta)
@@ -321,7 +331,7 @@ function twitter_block_block_view($delta) {
     '#options' => array(
       'attributes' => array(
         'class' => array('twitter-timeline'),
-        'data-widget-id' => $data['widget_id'],
+        'data-widget-id' => $config['widget_id'],
         'data-theme' => $data['theme'],
         'data-link-color' => !empty($data['link_color']) ? '#' . $data['link_color'] : $data['link_color'],
         'width' => $data['width'],

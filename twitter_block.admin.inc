@@ -35,10 +35,16 @@ function twitter_block_add_block_form($form, &$form_state) {
  * @see twitter_block_add_block_form_submit()
  */
 function twitter_block_add_block_form_validate($form, &$form_state) {
-  $twitter_block_exists = (bool) db_query_range('SELECT 1 FROM {twitter_block} WHERE info = :info', 0, 1, array(':info' => $form_state['values']['info']))->fetchField();
+  $unique_description = (bool) db_query_range('SELECT 1 FROM {twitter_block} WHERE info = :info', 0, 1, array(':info' => $form_state['values']['info']))->fetchField();
 
-  if (empty($form_state['values']['info']) || $twitter_block_exists) {
+  if (empty($form_state['values']['info']) || $unique_description) {
     form_set_error('info', t('Ensure that each block description is unique.'));
+  }
+
+  $unique_widget_id = (bool) db_query_range('SELECT 1 FROM {twitter_block} WHERE widget_id = :widget_id', 0, 1, array(':widget_id' => $form_state['values']['widget_id']))->fetchField();
+
+  if (empty($form_state['values']['widget_id']) || $unique_widget_id) {
+    form_set_error('widget_id', t('Ensure that each block widget ID is unique.'));
   }
 }
 
@@ -53,7 +59,6 @@ function twitter_block_add_block_form_validate($form, &$form_state) {
 function twitter_block_add_block_form_submit($form, &$form_state) {
   // The serialized 'data' column contains the timeline settings.
   $data = array(
-    'widget_id' => $form_state['values']['widget_id'],
     'theme' => $form_state['values']['theme'],
     'link_color' => $form_state['values']['link_color'],
     'width' => $form_state['values']['width'],
@@ -69,6 +74,7 @@ function twitter_block_add_block_form_submit($form, &$form_state) {
   $delta = db_insert('twitter_block')
     ->fields(array(
       'info' => $form_state['values']['info'],
+      'widget_id' => $form_state['values']['widget_id'],
       'data' => serialize($data),
     ))
     ->execute();
