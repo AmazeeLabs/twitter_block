@@ -180,8 +180,13 @@ function twitter_block_custom_block_form($edit = array()) {
     '#title' => t('Widget ID'),
     '#default_value' => $edit['widget_id'],
     '#required' => TRUE,
+    '#description' => t(''),
   );
-  $form['theme'] = array(
+  $form['appearance'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Appearance'),
+  );
+  $form['appearance']['theme'] = array(
     '#type' => 'select',
     '#title' => t('Theme'),
     '#default_value' => $edit['theme'],
@@ -189,30 +194,27 @@ function twitter_block_custom_block_form($edit = array()) {
       '' => t('Default'),
       'dark' => t('Dark'),
     ),
+    '#description' => t('Select a theme for the widget.'),
   );
-  $form['link_color'] = array(
+  $form['appearance']['link_color'] = array(
     '#type' => 'textfield',
     '#title' => t('Link color'),
     '#default_value' => $edit['link_color'],
     '#maxlength' => 6,
     '#size' => 6,
     '#field_prefix' => '#',
+    '#description' => t('Change the link color used by the widget. Takes an %format hex format color. Note that some icons in the widget will also appear this color.', array('%format' => 'abc123')),
   );
-  $form['width'] = array(
+  $form['appearance']['border_color'] = array(
     '#type' => 'textfield',
-    '#title' => t('Width'),
-    '#default_value' => $edit['width'],
+    '#title' => t('Border color'),
+    '#default_value' => $edit['border_color'],
+    '#maxlength' => 6,
     '#size' => 6,
-    '#field_suffix' => 'px',
+    '#field_prefix' => '#',
+    '#description' => t('Change the border color used by the widget. Takes an %format hex format color.', array('%format' => 'abc123')),
   );
-  $form['height'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Height'),
-    '#default_value' => $edit['height'],
-    '#size' => 6,
-    '#field_suffix' => 'px',
-  );
-  $form['chrome'] = array(
+  $form['appearance']['chrome'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Chrome'),
     '#default_value' => $edit['chrome'],
@@ -222,28 +224,56 @@ function twitter_block_custom_block_form($edit = array()) {
       'noborders' => t('No borders'),
       'transparent' => t('Transparent'),
     ),
+    '#description' => t('Control the widget layout and chrome.'),
   );
-  $form['border_color'] = array(
+  $form['functionality'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Functionality'),
+  );
+  $form['functionality']['related'] = array(
     '#type' => 'textfield',
-    '#title' => t('Border color'),
-    '#default_value' => $edit['border_color'],
-    '#maxlength' => 6,
-    '#size' => 6,
-    '#field_prefix' => '#',
+    '#title' => t('Related users'),
+    '#default_value' => $edit['related'],
+    '#description' => t('As per the Tweet and follow buttons, you may provide a comma-separated list of user screen names as suggested followers to a user after they reply, Retweet, or favorite a Tweet in the timeline.'),
   );
-  $form['language'] = array(
+  $form['size'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Size'),
+    '#description' => t('Embedded timelines are flexible and adaptive, functioning at a variety of dimensions ranging from wide to narrow, and short to tall. The default dimensions for a timeline are 520×600px, which can be overridden to fit the dimension requirements of your page. Setting a width is not required, and by default the widget will shrink to the width of its parent element in the page.'),
+  );
+  $form['size']['width'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Width'),
+    '#default_value' => $edit['width'],
+    '#size' => 6,
+    '#field_suffix' => 'px',
+    '#description' => t('Change the width of the widget.'),
+  );
+  $form['size']['height'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Height'),
+    '#default_value' => $edit['height'],
+    '#size' => 6,
+    '#field_suffix' => 'px',
+    '#description' => t('Change the height of the widget.'),
+  );
+  $form['size']['note'] = array(
+    '#type' => 'markup',
+    '#markup' => '<p>' . t('The minimum width of a timeline is 180px and the maximum is 520px. The minimum height is 200px.') . '</p>',
+  );
+  $form['accessibility'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Accessibility'),
+  );
+  $form['accessibility']['language'] = array(
     '#type' => 'textfield',
     '#title' => t('Language'),
     '#default_value' => $edit['language'],
     '#maxlength' => 5,
     '#size' => 5,
+    '#description' => t('The widget language is detected from the page, based on the language of your content. Enter a <a href="@website">language code</a> to manually override the language.', array('@website' => 'http://www.w3.org/TR/html401/struct/dirlang.html#h-8.1.1')),
   );
-  $form['related'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Related users'),
-    '#default_value' => $edit['related'],
-  );
-  $form['polite'] = array(
+  $form['accessibility']['polite'] = array(
     '#type' => 'select',
     '#title' => t('ARIA politeness'),
     '#options' => array(
@@ -251,6 +281,7 @@ function twitter_block_custom_block_form($edit = array()) {
       'assertive' => t('Assertive'),
     ),
     '#default_value' => $edit['polite'],
+    '#description' => t('ARIA is an accessibility system that aids people using assistive technology interacting with dynamic web content. <a href="@website">Read more about ARIA on W3C\'s website</a>. By default, the embedded timeline uses the least obtrusive setting: "polite". If you\'re using an embedded timeline as a primary source of content on your page, you may wish to override this to the assertive setting, using "assertive".', array('@website' => 'http://www.w3.org/WAI/intro/aria.php')),
   );
 
   return $form;
