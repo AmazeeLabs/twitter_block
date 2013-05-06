@@ -224,6 +224,7 @@ function twitter_block_custom_block_form($edit = array()) {
       'noheader' => t('No header'),
       'nofooter' => t('No footer'),
       'noborders' => t('No borders'),
+      'noscrollbar' => t('No scrollbar'),
       'transparent' => t('Transparent'),
     ),
     '#description' => t('Control the widget layout and chrome.'),
