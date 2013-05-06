@@ -61,6 +61,6 @@ widget IDs) or create new embedded timeline widgets by visiting
 https://twitter.com/settings/widgets (make sure that you're logged in).
 
 You can determine a widget's ID by editing it and inspecting the URL (which
-should be in the form of https://twitter.com/settings/widgets/%WIDGET_ID%/edit)
+should be in the form of https://twitter.com/settings/widgets/WIDGET_ID/edit)
 or by looking at the widget's embed code (look for
-data-widget-id="%WIDGET_ID%").
+data-widget-id="WIDGET_ID").

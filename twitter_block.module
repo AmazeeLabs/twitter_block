@@ -100,6 +100,7 @@ function twitter_block_form_block_admin_display_form_alter(&$form, &$form_state,
  *   - chrome: Chrome.
  *   - border_color: Border color.
  *   - language: Language.
+ *   - tweet_limit: Tweet limit.
  *   - related: Related users.
  *   - polite: ARIA politeness.
  */
@@ -163,6 +164,7 @@ function twitter_block_custom_block_form($edit = array()) {
     'chrome' => array(),
     'border_color' => '',
     'language' => '',
+    'tweet_limit' => '',
     'related' => '',
     'polite' => array(),
   );
@@ -180,7 +182,7 @@ function twitter_block_custom_block_form($edit = array()) {
     '#title' => t('Widget ID'),
     '#default_value' => $edit['widget_id'],
     '#required' => TRUE,
-    '#description' => t(''),
+    '#description' => t('Each Twitter Block block requires a unique widget ID which determines, among other things, the source (user timeline, favourites, list or search) of the tweets to display. You can view a list of your existing embedded timeline widgets (and their widget IDs) or create new embedded timeline widgets by visiting the <a href="@widgets_section">widgets section of your settings page</a> (make sure that you\'re logged in). You can determine a widget\'s ID by editing it and inspecting the URL (which should be in the form of twitter.com/settings/widgets/WIDGET_ID/edit) or by looking at the widget\'s embed code (look for data-widget-id="WIDGET_ID").', array('@widgets_section' => 'https://twitter.com/settings/widgets')),
   );
   $form['appearance'] = array(
     '#type' => 'fieldset',
@@ -235,6 +237,13 @@ function twitter_block_custom_block_form($edit = array()) {
     '#title' => t('Related users'),
     '#default_value' => $edit['related'],
     '#description' => t('As per the Tweet and follow buttons, you may provide a comma-separated list of user screen names as suggested followers to a user after they reply, Retweet, or favorite a Tweet in the timeline.'),
+  );
+  $form['functionality']['tweet_limit'] = array(
+    '#type' => 'select',
+    '#title' => t('Tweet limit'),
+    '#default_value' => $edit['tweet_limit'],
+    '#options' => drupal_map_assoc(range(1, 20)),
+    '#description' => t('Fix the size of a timeline to a preset number of Tweets between 1 and 20. The timeline will render the specified number of Tweets from the timeline, expanding the height of the widget to display all Tweets without scrolling. Since the widget is of a fixed size, it will not poll for updates when using this option.'),
   );
   $form['size'] = array(
     '#type' => 'fieldset',
@@ -308,6 +317,7 @@ function twitter_block_block_save($delta = 0, $edit = array()) {
  *   - chrome: Chrome.
  *   - border_color: Border color.
  *   - language: Language.
+ *   - tweet_limit: Tweet limit.
  *   - related: Related users.
  *   - polite: ARIA politeness.
  * @param $delta
@@ -326,6 +336,7 @@ function twitter_block_custom_block_save($edit, $delta) {
     'chrome' => $edit['chrome'],
     'border_color' => $edit['border_color'],
     'language' => $edit['language'],
+    'tweet_limit' => $edit['tweet_limit'],
     'related' => $edit['related'],
     'polite' => $edit['polite'],
   );
@@ -370,7 +381,8 @@ function twitter_block_block_view($delta) {
         'data-chrome' => !empty($data['chrome']) ? implode(' ', array_keys($data['chrome'])) : $data['chrome'],
         'data-border-color' => !empty($data['border_color']) ? '#' . $data['border_color'] : $data['border_color'],
         'lang' => $data['language'],
-        'data-related' => $data['language'],
+        'data-tweet-limit' => $data['tweet_limit'],
+        'data-related' => $data['related'],
         'aria-polite' => $data['polite'],
       ),
       'html' => FALSE,

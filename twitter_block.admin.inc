@@ -66,6 +66,7 @@ function twitter_block_add_block_form_submit($form, &$form_state) {
     'chrome' => $form_state['values']['chrome'],
     'border_color' => $form_state['values']['border_color'],
     'language' => $form_state['values']['language'],
+    'tweet_limit' => $form_state['values']['tweet_limit'],
     'related' => $form_state['values']['related'],
     'polite' => $form_state['values']['polite'],
   );
