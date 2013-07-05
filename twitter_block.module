@@ -47,10 +47,10 @@ function twitter_block_menu() {
     }
   }
 
-  $items['admin/structure/block/administer/%/%/delete'] = array(
+  $items['admin/structure/block/administer/twitter_block/%/delete'] = array(
     'title' => 'Delete Twitter block',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('twitter_block_delete', 4, 5),
+    'page arguments' => array('twitter_block_delete', 5),
     'access arguments' => array('administer blocks'),
     'type' => MENU_CALLBACK,
     'file' => 'twitter_block.admin.inc',
