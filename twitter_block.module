@@ -404,7 +404,17 @@ function twitter_block_block_view($delta) {
   }
 
   if (!empty($data['chrome'])) {
-    $block['content']['#options']['attributes']['data-chrome'] = implode(' ', array_keys($data['chrome']));
+    $options = array();
+
+    foreach ($data['chrome'] as $option => $status) {
+      if ($status) {
+        $options[] = $option;
+      }
+    }
+
+    if (count($options)) {
+      $block['content']['#options']['attributes']['data-chrome'] = implode(' ', $options);
+    }
   }
 
   if (!empty($data['border_color'])) {
