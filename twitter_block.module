@@ -434,7 +434,7 @@ function twitter_block_block_view($delta) {
   }
 
   if (!empty($data['polite'])) {
-    $block['content']['#options']['attributes']['aria-polite'] = $data['polite'];
+    $block['content']['#options']['attributes']['data-aria-polite'] = $data['polite'];
   }
 
   return $block;
