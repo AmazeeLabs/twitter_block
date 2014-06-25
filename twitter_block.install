@@ -62,6 +62,13 @@ function twitter_block_uninstall() {
     ->condition('module', 'twitter_block')
     ->execute();
 
+  // Remove variables.
+  variable_del('twitter_block_cache');
+  variable_del('twitter_block_last_cache');
+
+  // Remove the cache directory.
+  twitter_block_clear_js_cache();
+
   // Clear the site cache
   cache_clear_all();
 }
